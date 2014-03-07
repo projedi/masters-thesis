@@ -1,0 +1,47 @@
+\frame {
+   \frametitle{Program extraction}
+   Трансляция кода Agda в код Haskell.
+
+   \begin{itemize}
+      \item Использование из внешнего кода на Haskell
+      \item Производительность. Скомпилированный код будет работать быстрее интепретации
+   \end{itemize}
+
+   Задачи:
+   \begin{enumerate}
+      \item трансляция кода из Agda в Haskell(уже решена транслятором MAlonzo)
+      \item поддержка интерфейса для использования получившегося кода
+   \end{enumerate}
+}
+
+%\frame {
+   %\frametitle{Prior art}
+   %Задачи:
+   %\begin{enumerate}
+      %\item трансляция кода из Agda в Haskell
+      %\item поддержка интерфейса для использования получившегося кода
+   %\end{enumerate}
+
+   %\begin{itemize}
+      %\item MAlonzo компилятор из Agda в Haskell; решает первую задачу
+      %\item Coq \(\rightarrow\) \{ ML, Haskell, Scheme \}; решают первую и вторую задачи
+   %\end{itemize}
+%}
+
+\frame {
+   \frametitle{Expected results}
+   \begin{enumerate}
+      \item Проаннотировать код на Agda для описания интерфейса%, например так:\\
+      %\texttt{\{-\#\ EXTRACT\ (agda-term)\ (haskell-name :: haskell-type)\ \#-\}}
+      \item Доказать, что конвертация типов Agda к типам Haskell'а корректно
+      \item По аннотациям сгенерировать код на Haskell
+   \end{enumerate}
+   \begin{itemize}
+      \item Модуль для typechecker'а, проверяющий корректность конвертации
+      \item Модуль для транслятора, преобразующий аннотации в код на Haskell.
+   \end{itemize}
+}
+
+\frame {
+   \center \Huge Q\&A
+}
