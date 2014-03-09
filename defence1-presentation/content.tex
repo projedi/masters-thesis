@@ -1,13 +1,72 @@
 \frame {
-   \frametitle{What is it exactly that I want to do?}
+   \frametitle{Мотивирующий пример}
+   TODO: Пример, который легко ломается в хаскеле и легко чинится зависимыми типами.
 }
 
 \frame {
-   \frametitle{What are dependent types}
+   \frametitle{Зависимые типы}
+   System F:
+   \begin{align*}
+      \mathbf{Term} &::= \mathbf{Var}\ |\ \lambda x.\ \mathbf{Term}(x)\ |
+                         \ \mathbf{Term}\ \mathbf{Term} \\
+      \mathbf{Type} &::= \mathbf{TVar}\ |\ \mathbf{Type} \rightarrow \mathbf{Type}\ |
+                         \ \forall x.\ \mathbf{Type}(x)
+   \end{align*}
+   \pause
+   Зависимые типы:
+   \begin{align*}
+      \mathbf{Term} ::=&\ \mathbf{Var}\\
+                      |&\ \mathbf{Term}\ \mathbf{Term}\\
+                      |&\ \lambda x.\ \mathbf{Term}(x)\\
+                      |&\ (x : \mathbf{Term}) \rightarrow \mathbf{Term}(x)\\
+                      |&\ (\mathbf{Term}, \mathbf{Term})\\
+                      |&\ (x : \mathbf{Term}) \times \mathbf{Term}(x)\\
+   \end{align*}
 }
 
 \frame {
-   \frametitle{What is Agda}
+   \frametitle{Agda}
+   Язык с зависимыми типами и синтаксисом, похожим на Haskell.
+}
+
+\frame {
+   \frametitle{Agda - примеры}
+   \begin{align*}
+      &\mathbf{data}\ List\ (A : Set) : Set\ \mathbf{where}\\
+      &\ \ \ \text{<>} : List\ A \\
+      &\ \ \ \text{\_::\_} : A \rightarrow List\ A \rightarrow List\ A \\
+      \\
+      &\text{list-length} : \{A : Set\} \rightarrow List\ A \rightarrow Nat \\
+      &\text{list-length}\ <>\ = 0 \\
+      &\text{list-length}\ (x :: xs) = \text{list-length}\ xs + 1 \\
+   \end{align*}
+}
+\frame {
+   \frametitle{Agda - примеры}
+   \begin{align*}
+      &\mathbf{data}\ Vec\ (A : Set) : Nat \rightarrow Set\ \mathbf{where}\\
+      &\ \ \ \text{nil} : Vec\ A\ 0 \\
+      &\ \ \ \text{cons} : \{n : Nat\} \rightarrow A \rightarrow Vec\ A\ n \rightarrow
+         Vec\ A\ (n + 1) \\
+      \\
+      &\text{list-to-vec} : \{A : Set\} \rightarrow (xs : List\ A) \rightarrow
+         Vec\ A\ (\text{list-length}\ xs) \\
+      &\text{list-to-vec}\ <>\ = \text{nil}\\
+      &\text{list-to-vec}\ (x::xs) = \text{cons}\ x\ (\text{list-to-vec}\ xs)\\
+      \\
+      &\text{zip-vec} : \{A\ B : Set\} \{n : Nat\} \rightarrow Vec\ A\ n
+         \rightarrow Vec\ B\ n \rightarrow Vec\ (A \times B)\ n\\
+      &\text{zip-vec}\ \text{nil}\ \text{nil}\ =\ \text{nil}\\
+      &\text{zip-vec}\ (\text{cons}\ x\ xs)\ (\text{cons}\ y\ ys)\ =\ 
+         \text{cons}\ (x, y)\ (\text{zip-vec}\ xs\ ys)\\
+      &\color{red}{\text{zip-vec}\ \text{nil}\ (\text{cons}\ y\ ys)\ =\ \dots}\\
+      &\color{red}{\text{zip-vec}\ (\text{cons}\ x\ xs)\ \text{nil}\ =\ \dots}\\
+   \end{align*}
+}
+
+\frame {
+   \frametitle{Agda}
+   TODO: Пример с первого слайда
 }
 
 \frame {
