@@ -70,15 +70,59 @@
 }
 
 \frame {
-   \frametitle{How does MAlonzo work}
+   \frametitle{Компилятор MAlonzo}
+   \begin{align*}
+      &\mathbf{data}\ Vec\ (A : Set) : Nat \rightarrow Set\ \mathbf{where}\\
+      &\ \ \ \text{nil} : Vec\ A\ 0 \\
+      &\ \ \ \text{cons} : \{n : Nat\} \rightarrow A \rightarrow Vec\ A\ n \rightarrow
+         Vec\ A\ (n + 1) \\
+      &\text{vec-map} : \{A\ B : Set\} \{n : Nat\} \rightarrow (A \rightarrow B)
+         \rightarrow Vec\ A\ n \rightarrow Vec\ B\ n\\
+      &\text{vec-map}\ f\ \text{nil} = \text{nil} \\
+      &\text{vec-map}\ f\ (\text{cons}\ x\ xs) = \text{cons}\ (f\ x)
+         \ (\text{vec-map}\ f\ xs)\\
+      \\
+      &\mathbf{data}\ T_1\ a_0\ a_1\ a_2 = C_2\ |\ C_3\ a_0\ a_1\ a_2\\
+      &\text{d}_4\ v_0\ v_1\ v_2\ v_3\ (C_2) = \text{cast}\ C_2\\
+      &\text{d}_4\ v_0\ v_1\ v_2\ v_3\ (C_3\ v_4\ v_5\ v_6) = \text{cast}\ (
+         C_3\ (\text{cast}\ v_4)
+         \ (\text{cast}\ (v_3\ (\text{cast}\ v_5))) \\
+      &\ \ \ (\text{cast}\ (\text{d}_4\ (\text{cast}\ v_0)\ (\text{cast}\ v_1)
+         \ (\text{cast}\ v_4)\ (\text{cast}\ v_3)\ (\text{cast}\ v_6))))\\
+      &\textbf{ghci>\ :t}\ \text{d}_4\\
+      &\text{d}_4\ ::\ a \rightarrow a_1 \rightarrow a_2
+         \rightarrow a_3 \rightarrow (T_1\ t\ t_1\ t_2) \rightarrow b
+   \end{align*}
 }
 
 \frame {
-   \frametitle{What do the Coq people do here}
+   \frametitle{Coq}
+   \begin{align*}
+      &\mathbf{Inductive}\ \text{vec}\ (A : Set) : nat \rightarrow Set \coloneqq
+         \text{nil} : \text{vec}\ A\ 0\\
+      &\ |\ \text{cons} : \forall n : \text{nat},\ A \rightarrow \text{vec}\ A\ n
+         \rightarrow \text{vec}\ A\ (n + 1).\\
+      &\mathbf{Fixpoint}\ \text{vMap}\ (A : Set)(B : Set)n(f : A \rightarrow B)
+         (v : \text{vec}\ A\ n) : \text{vec}\ B\ n \coloneqq\\
+      &\ \ \ \mathbf{match}\ v\ \mathbf{with}\ \text{nil} \Rightarrow \text{nil}\ \_\\
+      &\ \ \ |\ \text{cons}\ \_\ x\ xs \Rightarrow \text{cons}\ \_\ \_\ (f\ x)
+         \ (\text{vMap}\ \_\ \_\ \_\ f\ xs)\\
+      &\mathbf{end}.\\
+      \\
+      &\mathbf{data}\ Vec\ a = \text{Nil}\ |\ \text{Cons}\ Nat\ a\ (Vec\ a)\\
+      &\text{vMap}\ ::\ Nat \rightarrow (a_1 \rightarrow a_2) \rightarrow Vec\ a_1
+         \rightarrow Vec\ a_2\\
+      &\text{vMap}\ n\ f\ v = \mathbf{case}\ v\ \mathbf{of}\\
+      &\ \ \ \text{Nil} \rightarrow \text{Nil}\\
+      &\ \ \ \text{Cons}\ n_0\ x\ xs \rightarrow \text{Cons}\ n_0\ (f\ x)
+         \ (\text{vMap}\ n_0\ f\ xs)\\
+   \end{align*}
 }
 
 \frame {
    \frametitle{What am I doing}
+   Both are not good enough. I want to extract only some parts that when extracted
+   will not blow up invariants.
 }
 
 \frame {
