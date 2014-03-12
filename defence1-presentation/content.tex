@@ -120,13 +120,35 @@
 }
 
 \frame {
-   \frametitle{What am I doing}
-   Both are not good enough. I want to extract only some parts that when extracted
-   will not blow up invariants.
+   \frametitle{Что хочется}
+   Идея: Экспортировать только то, что при преобразовании типов не потеряет информацию(инварианты).
+
+   \vspace{3em}
+   Сначала разрешаем только типы, которые имеют полный аналог в Haskell.
+   Потом добавляем отдельные случаи зависимых типов, представляемых в Haskell.
 }
 
 \frame {
-   \frametitle{Are you sure I deserve a masters degree?}
-   \center{aka}\\
+   \frametitle{Что сделано}
+   С помощью прагм \texttt{\{-\# EXPORT agda-name haskell-name \#-\}}
+   можно экспортировать типы и функции(тип которых выводится автоматически).
+
+   Но типы экспортируются только как абстрактные(\texttt{newtype}), а не с конструкторами(\texttt{data}).
+
+   TODO: go into detail here
+}
+
+\frame {
+   \frametitle{А что можно попробовать}
+   \begin{enumerate}
+      \item разрешить экспортировать типы с конструкторами
+      \item зависимые типы вроде \( f : \{A\ B : Set\}\{n : Nat\} \rightarrow Vec\ A\ n \rightarrow
+         Vec\ B\ n \rightarrow Vec\ (A \times B)\ n \)
+         могут быть экспортированы, если \(n\) не используется внутри \(f\)
+      \item есть трюк, позволяющий экспортировать типы вроде \( f : \{A : Set\}(n : Nat) \rightarrow A \rightarrow Vec\ a\ n \)
+   \end{enumerate}
+}
+
+\frame {
    \center{\Huge Q\&A}
 }
