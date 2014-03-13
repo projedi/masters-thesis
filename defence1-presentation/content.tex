@@ -12,16 +12,21 @@
       \mathbf{Type} &::= \mathbf{TVar}\ |\ \mathbf{Type} \rightarrow \mathbf{Type}\ |
                          \ \forall x.\ \mathbf{Type}(x)
    \end{align*}
+   \[
+      \mathbf{\Gamma} \vdash \mathbf{Term} : \mathbf{Type},\quad \mathbf{\Gamma} = \mathbf{Var} : \mathbf{Type},\dots
+   \]
    \pause
    Зависимые типы:
    \begin{align*}
       \mathbf{Term} ::=&\ \mathbf{Var}\\
                       |&\ \mathbf{Term}\ \mathbf{Term}\\
-                      |&\ \lambda x.\ \mathbf{Term}(x)\\
-                      |&\ (x : \mathbf{Term}) \rightarrow \mathbf{Term}(x)\\
-                      |&\ (\mathbf{Term}, \mathbf{Term})\\
-                      |&\ (x : \mathbf{Term}) \times \mathbf{Term}(x)\\
+                      |&\ \lambda x.\ \mathbf{Term}(x)\ |\ (x : \mathbf{Term}) \rightarrow \mathbf{Term}(x)\\
+                      |&\ (\mathbf{Term}, \mathbf{Term})\ |\ (x : \mathbf{Term}) \times \mathbf{Term}(x)\\
+                      |&\ \mathbf{Set}
    \end{align*}
+   \[
+      \mathbf{\Gamma} \vdash \mathbf{Term} : \mathbf{Term},\quad \mathbf{\Gamma} = \mathbf{Var} : \mathbf{Term},\dots
+   \]
 }
 
 \frame {
@@ -32,10 +37,12 @@
 \frame {
    \frametitle{Agda - примеры}
    \begin{align*}
+      &{\color{red}\mathbf{data}} \textit{ работает аналогично GADT в Haskell}\\
       &\mathbf{data}\ List\ (A : Set) : Set\ \mathbf{where}\\
       &\ \ \ \text{<>} : List\ A \\
       &\ \ \ \text{\_::\_} : A \rightarrow List\ A \rightarrow List\ A \\
       \\
+      &{\color{red}\{\ \dots\}}\textit{ --- необязательный аргумент(компилятор сам подставит)} \\
       &\text{list-length} : \{A : Set\} \rightarrow List\ A \rightarrow Nat \\
       &\text{list-length}\ <>\ = 0 \\
       &\text{list-length}\ (x :: xs) = \text{list-length}\ xs + 1 \\
@@ -49,18 +56,17 @@
       &\ \ \ \text{cons} : \{n : Nat\} \rightarrow A \rightarrow Vec\ A\ n \rightarrow
          Vec\ A\ (n + 1) \\
       \\
-      &\text{list-to-vec} : \{A : Set\} \rightarrow (xs : List\ A) \rightarrow
-         Vec\ A\ (\text{list-length}\ xs) \\
-      &\text{list-to-vec}\ <>\ = \text{nil}\\
-      &\text{list-to-vec}\ (x::xs) = \text{cons}\ x\ (\text{list-to-vec}\ xs)\\
+      &{\color{red}\{ a : A \}\{ b : B \}(c : C)} \textit{ --- синтаксический сахар для }\\
+      &\ \ \ \{ a : A \} \rightarrow \{ b : B \} \rightarrow \{ c : C \}\\
       \\
       &\text{zip-vec} : \{A\ B : Set\} \{n : Nat\} \rightarrow Vec\ A\ n
          \rightarrow Vec\ B\ n \rightarrow Vec\ (A \times B)\ n\\
       &\text{zip-vec}\ \text{nil}\ \text{nil}\ =\ \text{nil}\\
       &\text{zip-vec}\ (\text{cons}\ x\ xs)\ (\text{cons}\ y\ ys)\ =\ 
          \text{cons}\ (x, y)\ (\text{zip-vec}\ xs\ ys)\\
-      &\color{red}{\text{zip-vec}\ \text{nil}\ (\text{cons}\ y\ ys)\ =\ \dots}\\
-      &\color{red}{\text{zip-vec}\ (\text{cons}\ x\ xs)\ \text{nil}\ =\ \dots}\\
+      &\color{red}\text{zip-vec}\ \text{nil}\ (\text{cons}\ y\ ys)\ =\ \dots\\
+      &\color{red}\text{zip-vec}\ (\text{cons}\ x\ xs)\ \text{nil}\ =\ \dots\\
+      &\textit{эти 2 клоза даже написать нельзя - типы не сойдутся}
    \end{align*}
 }
 
