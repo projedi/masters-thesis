@@ -56,11 +56,21 @@
       &\ \ \ \text{cons} : \{n : Nat\} \rightarrow A \rightarrow Vec\ A\ n \rightarrow
          Vec\ A\ (n + 1) \\
       \\
-      &{\color{red}\{ a : A \}\{ b : B \}(c : C)} \textit{ --- синтаксический сахар для }\\
-      &\ \ \ \{ a : A \} \rightarrow \{ b : B \} \rightarrow \{ c : C \}\\
+      &\text{list-to-vec} : \{A : Set\} \rightarrow (xs : List\ A) \rightarrow
+         Vec\ A\ ({\color{red}\text{list-length}\ xs}) \\
+      &\text{list-to-vec}\ <>\ = \text{nil}\\
+      &\text{list-to-vec}\ (x::xs) = \text{cons}\ x\ (\text{list-to-vec}\ xs)\\
+   \end{align*}
+}
+\frame {
+   \frametitle{Agda - примеры}
+   \begin{align*}
+      &{\color{red}\{ a_1\ a_2 : A \}(b : B) \rightarrow C} \textit{ --- синтаксический сахар для }\\
+      &\ \ \ \{ a_1 : A \} \rightarrow \{ a_2 : A \} \rightarrow ( b : B ) \rightarrow C\\
       \\
       &\text{zip-vec} : \{A\ B : Set\} \{n : Nat\} \rightarrow Vec\ A\ n
-         \rightarrow Vec\ B\ n \rightarrow Vec\ (A \times B)\ n\\
+         \rightarrow Vec\ B\ n \rightarrow\\
+      &\ \ \ Vec\ (A \times B)\ n\\
       &\text{zip-vec}\ \text{nil}\ \text{nil}\ =\ \text{nil}\\
       &\text{zip-vec}\ (\text{cons}\ x\ xs)\ (\text{cons}\ y\ ys)\ =\ 
          \text{cons}\ (x, y)\ (\text{zip-vec}\ xs\ ys)\\
@@ -108,10 +118,10 @@
          \text{nil} : \text{vec}\ A\ 0\\
       &\ |\ \text{cons} : \forall n : \text{nat},\ A \rightarrow \text{vec}\ A\ n
          \rightarrow \text{vec}\ A\ (n + 1).\\
-      &\mathbf{Fixpoint}\ \text{vMap}\ (A : Set)(B : Set)n(f : A \rightarrow B)
-         (v : \text{vec}\ A\ n) : \text{vec}\ B\ n \coloneqq\\
-      &\ \ \ \mathbf{match}\ v\ \mathbf{with}\ \text{nil} \Rightarrow \text{nil}\ \_\\
-      &\ \ \ |\ \text{cons}\ \_\ x\ xs \Rightarrow \text{cons}\ \_\ \_\ (f\ x)
+      &\mathbf{Fixpoint}\ \text{vMap}\ (A : Set)\ (B : Set)\ n\ (f : A \rightarrow B)\\
+      &\ \ \ (v : \text{vec}\ A\ n) : \text{vec}\ B\ n \coloneqq\\
+      &\ \ \ \ \ \ \mathbf{match}\ v\ \mathbf{with}\ \text{nil} \Rightarrow \text{nil}\ \_\\
+      &\ \ \ \ \ \ |\ \text{cons}\ \_\ x\ xs \Rightarrow \text{cons}\ \_\ \_\ (f\ x)
          \ (\text{vMap}\ \_\ \_\ \_\ f\ xs)\\
       &\mathbf{end}.\\
       \\
