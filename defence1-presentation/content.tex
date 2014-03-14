@@ -128,21 +128,51 @@
 
 \frame {
    \frametitle{Что хочется}
-   Идея: Экспортировать только то, что при преобразовании типов не потеряет информацию(инварианты).
-
-   \vspace{3em}
-   Сначала разрешаем только типы, которые имеют полный аналог в Haskell.
-   Потом добавляем отдельные случаи зависимых типов, представляемых в Haskell.
+   Нужно сохранить инварианты, поддерживаемые системой типов.
+   \vspace{1em}
+   \begin{block}{Идея}
+      \begin{enumerate}
+      \item Компилируем весь код в Haskell с помощью MAlonzo.
+      \item
+         Для выбранных имен пытаемся найти соответствующие типы на Haskell
+         и генерируем обертки над скомпилированным кодом.
+      \end{enumerate}
+   \end{block}
 }
 
 \frame {
-   \frametitle{Что сделано}
-   С помощью прагм \texttt{\{-\# EXPORT agda-name haskell-name \#-\}}
-   можно экспортировать типы и функции(тип которых выводится автоматически).
+   \frametitle{Простое решение}
+   \begin{Lem}
+   Типы Agda, лежащие в System F, представимы в Haskell и имеют ту же семантику.
+   \end{Lem}
+   {\color{red} Формально не доказывал, но, вроде, очевидно.}
 
-   Но типы экспортируются только как абстрактные(\texttt{newtype}), а не с конструкторами(\texttt{data}).
+   Указание на <<экспорт>> дается с помощью прагм\\
+   \texttt{\{-\# EXPORT agda-name haskell-name \#-\}}
 
-   TODO: go into detail here
+   \begin{itemize}
+   \item \(\mathbf{data}\ T\ (A : Set) : Set \rightarrow Set\ \mathbf{where}\)
+      породит
+      \(\mathbf{newtype}\ T\ a_0\ a_1 =\ \texttt{<hidden>}\)
+   \item \(f : \{ A : Set \} \rightarrow (\{ B : Set \} \rightarrow B)
+      \rightarrow A\) породит
+      \(f :: \forall a_0 .\ (\forall b_0 .\ b_0) \rightarrow a_0\)
+   \end{itemize}
+}
+
+\frame {
+   \frametitle{Недоработки}
+   \begin{itemize}
+      \item Haskell поддерживает \(\mathbf{data}\ T\ (a :: * \rightarrow *)\)
+         аналог в Agda \(\mathbf{data}\ T\ (A : Set \rightarrow Set)\)
+      \item Некоторые типы можно экспортировать вместе с конструкторами:\\
+         \texttt{\{-\# EXPORT\_DATA agda-name hs-name hs-con-name \dots\ \#-\}}\\
+         но тогда возникнут сложности с оборачиванием функций:
+         \textbf{newtype} гарантирует, что внутреннее представление совпадает с
+         оборачиваемым типом \(\Rightarrow\) можно делать \texttt{unsafeCoerce}.
+         \textbf{data} не может дать никаких похожих гарантий \(\Rightarrow\)
+         придется генерировать разбор по конструкторам.
+   \end{itemize}
 }
 
 \frame {
@@ -154,6 +184,14 @@
          могут быть экспортированы, если \(n\) не используется внутри \(f\)
       \item есть трюк, позволяющий экспортировать типы вроде \( f : \{A : Set\}(n : Nat) \rightarrow A \rightarrow Vec\ a\ n \)
    \end{enumerate}
+}
+
+\frame {
+   \frametitle{Gotchas}
+   \begin{itemize}
+      \item COMPILED
+      \item termination checking, totality
+   \end{itemize}
 }
 
 \frame {
