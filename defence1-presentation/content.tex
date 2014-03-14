@@ -162,16 +162,30 @@
 
 \frame {
    \frametitle{Недоработки}
+   Некоторые типы можно экспортировать вместе с конструкторами:\\
+   \texttt{\{-\# EXPORT\_DATA agda-name hs-name hs-con-name \dots\ \#-\}}\\
+   но тогда возникнут сложности с оборачиванием функций:
+   \textbf{newtype} гарантирует, что внутреннее представление совпадает с
+   оборачиваемым типом \(\Rightarrow\) можно делать \texttt{unsafeCoerce}.
+   \textbf{data} не может дать никаких похожих гарантий \(\Rightarrow\)
+   придется генерировать разбор по конструкторам.
+   TODO: Also when data inside newtype it is impossible.
+}
+
+\frame {
+   \frametitle{Недоработки}
    \begin{itemize}
       \item Haskell поддерживает \(\mathbf{data}\ T\ (a :: * \rightarrow *)\)
          аналог в Agda \(\mathbf{data}\ T\ (A : Set \rightarrow Set)\)
-      \item Некоторые типы можно экспортировать вместе с конструкторами:\\
-         \texttt{\{-\# EXPORT\_DATA agda-name hs-name hs-con-name \dots\ \#-\}}\\
-         но тогда возникнут сложности с оборачиванием функций:
-         \textbf{newtype} гарантирует, что внутреннее представление совпадает с
-         оборачиваемым типом \(\Rightarrow\) можно делать \texttt{unsafeCoerce}.
-         \textbf{data} не может дать никаких похожих гарантий \(\Rightarrow\)
-         придется генерировать разбор по конструкторам.
+      \item У Agda есть FFI в Haskell и есть набор встроенных типов. При компиляции
+         они обрабатываются специально.
+      \item В Agda eсть параметризованные модули:
+         \(\mathbf{module}\ \text{Main}\ (A : Set)\ \mathbf{where}\)
+      \item Сейчас все экспорты генерируются в том же модуле, что и скомпилированный
+         код(\texttt{MAlonzo.Code.Module.Name}. Лучше все это вынести в отдельное
+         поддерево \texttt{MAlonzo.Export.Module.Name}, чтобы экспортировать
+         \textbf{newtype} абстрактно(скрыв реализацию от пользователя) и чтобы
+         автоматически можно было сгенерировать документацию без мусора.
    \end{itemize}
 }
 
@@ -189,7 +203,6 @@
 \frame {
    \frametitle{Gotchas}
    \begin{itemize}
-      \item COMPILED
       \item termination checking, totality
    \end{itemize}
 }
