@@ -164,12 +164,22 @@
    \frametitle{Недоработки}
    Некоторые типы можно экспортировать вместе с конструкторами:\\
    \texttt{\{-\# EXPORT\_DATA agda-name hs-name hs-con-name \dots\ \#-\}}\\
-   но тогда возникнут сложности с оборачиванием функций:
-   \textbf{newtype} гарантирует, что внутреннее представление совпадает с
-   оборачиваемым типом \(\Rightarrow\) можно делать \texttt{unsafeCoerce}.
-   \textbf{data} не может дать никаких похожих гарантий \(\Rightarrow\)
-   придется генерировать разбор по конструкторам.
-   TODO: Also when data inside newtype it is impossible.
+   Проблема оборачивания функций:
+   \begin{itemize}
+   \item \textbf{newtype} гарантирует, что внутреннее представление совпадает с
+      оборачиваемым типом \(\Rightarrow\) \texttt{unsafeCoerce}.
+   \item \textbf{data} не может дать никаких похожих гарантий \(\Rightarrow\)
+      генерирование разбора по конструкторам.
+   \end{itemize}
+
+   Из этого же --- невозможно экспортировать \(f\):
+   \begin{align*}
+   &\mathbf{newtype}\ T_1\ a_0 = \dots\\
+   &\mathbf{data}\ T_2\ a_0 = \dots\\
+   \\
+   &f : \{A : Set\} \rightarrow (T_1 (T_2\ A)) \rightarrow A\\
+   &\color{red}f :: \forall a.\ T_1 (T_2\ a)) \rightarrow a
+   \end{align*}
 }
 
 \frame {
@@ -210,4 +220,3 @@
 \frame {
    \center{\Huge Q\&A}
 }
-% TODO: Also COMPILED
