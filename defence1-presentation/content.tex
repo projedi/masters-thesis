@@ -4,8 +4,11 @@
       &\texttt{elemAt :: [a] \(\rightarrow\) Int \(\rightarrow\) a}\\
       &\texttt{elemAt [] 3 = {\color{red}???}}\\
       \\
+      &\texttt{elemAt :: [a] \(\rightarrow\) Int \(\rightarrow\) Maybe a}\\
+      &\texttt{elemAt [] 3 = Nothing}\\
+      \\
       &\texttt{elemAt :: (xs :: [a]) \(\rightarrow\) (n :: Int) \(\rightarrow\)}\\
-      &\texttt{\ \ \ (n < (length xs)) \(\rightarrow\) a}\\
+      &\texttt{\ \ \ (n < length xs) \(\rightarrow\) a}\\
       &\texttt{\color{red}elemAt [] 3 (???) = \dots}
    \end{align*}
 }
@@ -225,14 +228,14 @@
    \frametitle{Что еще можно попробовать}
    На Haskell можно проэмулировать некоторые зависимые типы
    \begin{enumerate}
-      \item Если \texttt{n} не используется внутри \texttt{f}, то
+      \item Если \texttt{n} не используется внутри \texttt{vec-zip}, то
          \begin{align*}
-         &\texttt{f : \{A B : Set\}\{n : Nat\} \(\rightarrow\) Vec A n \(\rightarrow\)}\\
+         &\texttt{vec-zip : \{A B : Set\}\{n : Nat\} \(\rightarrow\) Vec A n \(\rightarrow\)}\\
          &\texttt{\ \ \ Vec B n \(\rightarrow\) Vec (A \(\times\) B) n}
          \end{align*}
          эмулируется без проблем.
       \item есть трюк, позволяющий эмулировать типы вроде
-         \[\texttt{f : \{A : Set\}(n : Nat) \(\rightarrow\) A \(\rightarrow\) Vec A n}\]
+         \[\texttt{replicate : \{A : Set\}(n : Nat) \(\rightarrow\) A \(\rightarrow\) Vec A n}\]
       \item \dots
    \end{enumerate}
 }
