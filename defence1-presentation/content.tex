@@ -1,6 +1,13 @@
 \frame {
    \frametitle{Мотивирующий пример}
-   TODO: Пример, который легко ломается в хаскеле и легко чинится зависимыми типами.
+   \begin{align*}
+      &\texttt{elemAt :: [a] \(\rightarrow\) Int \(\rightarrow\) a}\\
+      &\texttt{elemAt [] 3 = {\color{red}???}}\\
+      \\
+      &\texttt{elemAt :: (xs :: [a]) \(\rightarrow\) (n :: Int) \(\rightarrow\)}\\
+      &\texttt{\ \ \ (n < (length xs)) \(\rightarrow\) a}\\
+      &\texttt{\color{red}elemAt [] 3 (???) = \dots}
+   \end{align*}
 }
 
 \frame {
@@ -8,9 +15,11 @@
    System F:
    \begin{align*}
       \mathbf{Term} &::= \mathbf{Var}\ |\ \lambda x.\ \mathbf{Term}(x)\ |
-                         \ \mathbf{Term}\ \mathbf{Term} \\
+                         \ \mathbf{Term}\ \mathbf{Term}\ |
+                         \ (\mathbf{Term},\ \mathbf{Term}) \\
       \mathbf{Type} &::= \mathbf{TVar}\ |\ \mathbf{Type} \rightarrow \mathbf{Type}\ |
-                         \ \forall x.\ \mathbf{Type}(x)
+                         \ \forall x.\ \mathbf{Type}(x)\ |
+                         \ \mathbf{Type} \times \mathbf{Type}
    \end{align*}
    \[
       \mathbf{\Gamma} \vdash \mathbf{Term} : \mathbf{Type},\quad \mathbf{\Gamma} = \mathbf{Var} : \mathbf{Type},\dots
@@ -38,105 +47,118 @@
    \frametitle{Agda - примеры}
    \begin{align*}
       &{\color{red}\mathbf{data}} \textit{ работает аналогично GADT в Haskell}\\
-      &\mathbf{data}\ List\ (A : Set) : Set\ \mathbf{where}\\
-      &\ \ \ \text{<>} : List\ A \\
-      &\ \ \ \text{\_::\_} : A \rightarrow List\ A \rightarrow List\ A \\
+      &\mathbf{data}\texttt{ List (A : Set) : Set }\mathbf{where}\\
+      &\texttt{\ \ \ <> : List A}\\
+      &\texttt{\ \ \ \_::\_ : A \(\rightarrow\) List A \(\rightarrow\) List A}\\
       \\
-      &{\color{red}\{\ \dots\}}\textit{ --- необязательный аргумент(компилятор сам подставит)} \\
-      &\text{list-length} : \{A : Set\} \rightarrow List\ A \rightarrow Nat \\
-      &\text{list-length}\ <>\ = 0 \\
-      &\text{list-length}\ (x :: xs) = \text{list-length}\ xs + 1 \\
+      &\texttt{\color{red}\{\dots\}}
+         \textit{ --- необязательный аргумент(компилятор сам подставит)} \\
+      &\texttt{list-length : \{A : Set\} \(\rightarrow\) List\ A \(\rightarrow\) Nat}\\
+      &\texttt{list-length <> = 0}\\
+      &\texttt{list-length (x :: xs) = list-length xs + 1}\\
    \end{align*}
 }
 \frame {
    \frametitle{Agda - примеры}
    \begin{align*}
-      &\mathbf{data}\ Vec\ (A : Set) : Nat \rightarrow Set\ \mathbf{where}\\
-      &\ \ \ \text{nil} : Vec\ A\ 0 \\
-      &\ \ \ \text{cons} : \{n : Nat\} \rightarrow A \rightarrow Vec\ A\ n \rightarrow
-         Vec\ A\ (n + 1) \\
+      &\mathbf{data}\texttt{ Vec (A : Set) : Nat \(\rightarrow\) Set }\mathbf{where}\\
+      &\texttt{\ \ \ nil : Vec\ A\ 0}\\
+      &\texttt{\ \ \ cons : \{n : Nat\} \(\rightarrow\) A \(\rightarrow\) Vec\ A\ n
+         \(\rightarrow\) Vec A (n + 1)}\\
       \\
-      &\text{list-to-vec} : \{A : Set\} \rightarrow (xs : List\ A) \rightarrow
-         Vec\ A\ ({\color{red}\text{list-length}\ xs}) \\
-      &\text{list-to-vec}\ <>\ = \text{nil}\\
-      &\text{list-to-vec}\ (x::xs) = \text{cons}\ x\ (\text{list-to-vec}\ xs)\\
+      &\texttt{list-to-vec : \{A : Set\} \(\rightarrow\) (xs : List A) \(\rightarrow\)}\\
+      &\texttt{\ \ \ Vec A ({\color{red}list-length xs})}\\
+      &\texttt{list-to-vec\ <>\ = \text{nil}}\\
+      &\texttt{list-to-vec\ (x :: xs) = \text{cons}\ x\ (\text{list-to-vec}\ xs)}\\
    \end{align*}
 }
 \frame {
    \frametitle{Agda - примеры}
    \begin{align*}
-      &{\color{red}\{ a_1\ a_2 : A \}(b : B) \rightarrow C} \textit{ --- синтаксический сахар для }\\
-      &\ \ \ \{ a_1 : A \} \rightarrow \{ a_2 : A \} \rightarrow ( b : B ) \rightarrow C\\
+      &\texttt{\color{red}\{a1 a2 : A\}(b : B) \(\rightarrow\) C}
+         \textit{ --- синтаксический сахар для }\\
+      &\texttt{\ \ \ \{a1 : A\} \(\rightarrow\) \{a2 : A\} \(\rightarrow\)
+         (b : B) \(\rightarrow\) C}\\
       \\
-      &\text{zip-vec} : \{A\ B : Set\} \{n : Nat\} \rightarrow Vec\ A\ n
-         \rightarrow Vec\ B\ n \rightarrow\\
-      &\ \ \ Vec\ (A \times B)\ n\\
-      &\text{zip-vec}\ \text{nil}\ \text{nil}\ =\ \text{nil}\\
-      &\text{zip-vec}\ (\text{cons}\ x\ xs)\ (\text{cons}\ y\ ys)\ =\ 
-         \text{cons}\ (x, y)\ (\text{zip-vec}\ xs\ ys)\\
-      &\color{red}\text{zip-vec}\ \text{nil}\ (\text{cons}\ y\ ys)\ =\ \dots\\
-      &\color{red}\text{zip-vec}\ (\text{cons}\ x\ xs)\ \text{nil}\ =\ \dots\\
+      &\texttt{zip-vec : \{A B : Set\} \{n : Nat\} \(\rightarrow\) Vec A n
+         \(\rightarrow\) Vec B n \(\rightarrow\)}\\
+      &\texttt{\ \ \ Vec (A \(\times\) B) n}\\
+      &\texttt{zip-vec nil nil = nil}\\
+      &\texttt{zip-vec (cons x xs) (cons y ys) =}\\
+      &\texttt{\ \ \ cons (x , y) (zip-vec xs ys)}\\
+      &\color{red}\texttt{zip-vec nil (cons y ys) = \dots}\\
+      &\color{red}\texttt{zip-vec (cons x xs) nil = \dots}\\
       &\textit{эти 2 клоза даже написать нельзя - типы не сойдутся}
    \end{align*}
 }
 
 \frame {
    \frametitle{Agda}
-   TODO: Пример с первого слайда
+   \begin{align*}
+      &\mathbf{data}\ \texttt{\_<\_ : Nat \(\rightarrow\) Nat \(\rightarrow\) Set}
+         \ \mathbf{where}\\
+      &\ \ \ \texttt{leq-zero : \{n : Nat\} \(\rightarrow\) (0 < n + 1)}\\
+      &\ \ \ \texttt{leq-suc : \{n m : Nat\} \(\rightarrow\) (n < m) \(\rightarrow\)
+         (n + 1 < m + 1)}\\
+      \\
+      &\texttt{elemAt : \{A : Set\}(xs : List\ A)(n : Nat) }\rightarrow\\
+      &\texttt{\ \ \ (n < list-length xs) \(\rightarrow\) A}\\
+      &\texttt{elemAt <> \_ ()}\\
+      &\texttt{elemAt (x :: xs) 0 \_ = x}\\
+      &\texttt{elemAt (\_ :: xs) (n + 1) (leq-suc p) =
+         elemAt xs n p}\\
+   \end{align*}
 }
 
 \frame {
    \frametitle{Компилятор MAlonzo}
    \begin{align*}
-      &\mathbf{data}\ Vec\ (A : Set) : Nat \rightarrow Set\ \mathbf{where}\\
-      &\ \ \ \text{nil} : Vec\ A\ 0 \\
-      &\ \ \ \text{cons} : \{n : Nat\} \rightarrow A \rightarrow Vec\ A\ n \rightarrow
-         Vec\ A\ (n + 1) \\
-      &\text{vec-map} : \{A\ B : Set\} \{n : Nat\} \rightarrow (A \rightarrow B)
-         \rightarrow Vec\ A\ n \rightarrow Vec\ B\ n\\
-      &\text{vec-map}\ f\ \text{nil} = \text{nil} \\
-      &\text{vec-map}\ f\ (\text{cons}\ x\ xs) = \text{cons}\ (f\ x)
-         \ (\text{vec-map}\ f\ xs)\\
+      &\mathbf{data}\texttt{ Vec (A : Set) : Nat \(\rightarrow\) Set }\mathbf{where}\\
+      &\texttt{\ \ \ nil : Vec A 0}\\
+      &\texttt{\ \ \ cons : \{n : Nat\} \(\rightarrow\) A \(\rightarrow\) Vec A n
+         \(\rightarrow\) Vec A (n + 1)}\\
+      &\texttt{vec-map : \{A B : Set\}\{n : Nat\} \(\rightarrow\) (A \(\rightarrow\) B)
+         \(\rightarrow\)}\\
+      &\texttt{\ \ \ Vec A n \(\rightarrow\) Vec B n}\\
+      &\texttt{vec-map f nil = nil}\\
+      &\texttt{vec-map f (cons x xs) = cons (f x) (vec-map f xs)}\\
       \\
-      &\mathbf{data}\ T_1\ a_0\ a_1\ a_2 = C_2\ |\ C_3\ a_0\ a_1\ a_2\\
-      &\text{d}_4\ v_0\ v_1\ v_2\ v_3\ (C_2) = \text{cast}\ C_2\\
-      &\text{d}_4\ v_0\ v_1\ v_2\ v_3\ (C_3\ v_4\ v_5\ v_6) = \text{cast}\ (
-         C_3\ (\text{cast}\ v_4)
-         \ (\text{cast}\ (v_3\ (\text{cast}\ v_5))) \\
-      &\ \ \ (\text{cast}\ (\text{d}_4\ (\text{cast}\ v_0)\ (\text{cast}\ v_1)
-         \ (\text{cast}\ v_4)\ (\text{cast}\ v_3)\ (\text{cast}\ v_6))))\\
-      &\textbf{ghci>\ :t}\ \text{d}_4\\
-      &\text{d}_4\ ::\ a \rightarrow a_1 \rightarrow a_2
-         \rightarrow a_3 \rightarrow (T_1\ t\ t_1\ t_2) \rightarrow b
+      &\mathbf{data}\texttt{ T1 a0 a1 a2 = C2 | C3 a0 a1 a2}\\
+      &\texttt{d4 v0 v1 v2 v3 (C2) = cast C2}\\
+      &\texttt{d4 v0 v1 v2 v3 (C3 v4 v5 v6) = cast
+         (C3\ (cast v4) \dots)}\\
+      &\mathbf{ghci}\texttt{>:t d4}\\
+      &\texttt{d4 :: a \(\rightarrow\) a1 \(\rightarrow\) a2
+         \(\rightarrow\) a3 \(\rightarrow\) (T1 t t1 t2) \(\rightarrow\) b}
    \end{align*}
 }
 
 \frame {
    \frametitle{Coq}
    \begin{align*}
-      &\mathbf{data}\ Vec\ a = \text{Nil}\ |\ \text{Cons}\ Nat\ a\ (Vec\ a)\\
+      &\mathbf{data}\texttt{ Vec a = Nil | Cons Nat a (Vec a)}\\
       \\
-      &\text{vecMap}\ ::\ Nat \rightarrow (a_1 \rightarrow a_2) \rightarrow Vec\ a_1
-         \rightarrow Vec\ a_2\\
-      &\text{vecMap}\ n\ f\ v = \\
-      &\ \ \ \mathbf{case}\ v\ \mathbf{of}\\
-      &\ \ \ \ \text{Nil} \rightarrow \text{Nil}\\
-      &\ \ \ \ \text{Cons}\ n_0\ x\ xs \rightarrow \text{Cons}\ n_0\ (f\ x)
-         \ (\text{vecMap}\ n_0\ f\ xs)\\
+      &\texttt{vecMap :: Nat \(\rightarrow\) (a1 \(\rightarrow\) a2) \(\rightarrow\)
+         Vec a1 \(\rightarrow\) Vec a2}\\
+      &\texttt{vecMap n f v =}\\
+      &\ \ \ \mathbf{case}\ \texttt{v}\ \mathbf{of}\\
+      &\texttt{\ \ \ \ Nil \(\rightarrow\) Nil}\\
+      &\texttt{\ \ \ \ Cons n0 x xs \(\rightarrow\) Cons n0 (f x)
+         (vecMap n0 f xs)}\\
    \end{align*}
 }
 
 \frame {
    \frametitle{Что хочется}
+   \begin{block}{Идея}
    Нужно сохранить инварианты, поддерживаемые системой типов.
    \vspace{1em}
-   \begin{block}{Идея}
-      \begin{enumerate}
-      \item Компилируем весь код в Haskell с помощью MAlonzo.
-      \item
-         Для выбранных имен пытаемся найти соответствующие типы на Haskell
-         и генерируем обертки над скомпилированным кодом.
-      \end{enumerate}
+   \begin{enumerate}
+   \item Экспортируем весь код в Haskell с помощью MAlonzo.
+   \item
+      Для выбранных имен пытаемся найти соответствующие типы на Haskell
+      и генерируем обертки над скомпилированным кодом.
+   \end{enumerate}
    \end{block}
 }
 
@@ -145,18 +167,18 @@
    \begin{Lem}
    Типы Agda, лежащие в System F, представимы в Haskell и имеют ту же семантику.
    \end{Lem}
-   {\color{red} Формально не доказывал, но, вроде, очевидно.}
-
+   {\color{red} Формально не доказывал, но, вроде, очевидно.}\\
+   \vspace{1.5em}
    Указание на <<экспорт>> дается с помощью прагм\\
    \texttt{\{-\# EXPORT agda-name haskell-name \#-\}}
 
    \begin{itemize}
-   \item \(\mathbf{data}\ T\ (A : Set) : Set \rightarrow Set\ \mathbf{where}\)
+   \item \(\mathbf{data}\texttt{ T (A : Set) : Set \(\rightarrow\) Set }\mathbf{where}\)
       породит
-      \(\mathbf{newtype}\ T\ a_0\ a_1 =\ \texttt{<hidden>}\)
-   \item \(f : \{ A : Set \} \rightarrow (\{ B : Set \} \rightarrow B)
-      \rightarrow A\) породит
-      \(f :: \forall a_0 .\ (\forall b_0 .\ b_0) \rightarrow a_0\)
+      \(\mathbf{newtype}\texttt{ T a0 a1 = <hidden>}\)
+   \item \texttt{f : \{A : Set\} \(\rightarrow\) (\{B : Set\} \(\rightarrow\) B)
+      \(\rightarrow\) A} породит\\
+      \texttt{f :: \(\forall\)a0. (\(\forall\)b0. b0) \(\rightarrow\) a0}
    \end{itemize}
 }
 
@@ -172,25 +194,25 @@
       генерирование разбора по конструкторам.
    \end{itemize}
 
-   Из этого же --- невозможно экспортировать \(f\):
+   Из этого же --- невозможно экспортировать \texttt{f}:
    \begin{align*}
-   &\mathbf{newtype}\ T_1\ a_0 = \dots\\
-   &\mathbf{data}\ T_2\ a_0 = \dots\\
+   &\mathbf{newtype}\texttt{ T1 a0 = \dots}\\
+   &\mathbf{data}\texttt{ T2 a0 = \dots}\\
    \\
-   &f : \{A : Set\} \rightarrow (T_1 (T_2\ A)) \rightarrow A\\
-   &\color{red}f :: \forall a.\ T_1 (T_2\ a)) \rightarrow a
+   &\texttt{f : \{A : Set\} \(\rightarrow\) T1 (T2 A) \(\rightarrow\) A}\\
+   &\color{red}\texttt{f :: \(\forall\)a. T1 (T2 a) \(\rightarrow\) a}
    \end{align*}
 }
 
 \frame {
    \frametitle{Недоработки}
    \begin{itemize}
-      \item Haskell поддерживает \(\mathbf{data}\ T\ (a :: * \rightarrow *)\)
-         аналог в Agda \(\mathbf{data}\ T\ (A : Set \rightarrow Set)\)
+      \item Haskell поддерживает \(\mathbf{data}\texttt{ T (a :: * \(\rightarrow\) *)}\)
+         аналог в Agda \(\mathbf{data}\texttt{ T (A : Set \(\rightarrow\) Set)}\)
       \item У Agda есть FFI в Haskell и есть набор встроенных типов. При компиляции
          они обрабатываются специально.
       \item В Agda eсть параметризованные модули:
-         \(\mathbf{module}\ \text{Main}\ (A : Set)\ \mathbf{where}\)
+         \(\mathbf{module}\texttt{ Main (A : Set) }\mathbf{where}\)
       \item Сейчас все экспорты генерируются в том же модуле, что и скомпилированный
          код(\texttt{MAlonzo.Code.Module.Name}. Лучше все это вынести в отдельное
          поддерево \texttt{MAlonzo.Export.Module.Name}, чтобы экспортировать
@@ -200,20 +222,33 @@
 }
 
 \frame {
-   \frametitle{А что можно попробовать}
+   \frametitle{Что еще можно попробовать}
+   На Haskell можно проэмулировать некоторые зависимые типы
    \begin{enumerate}
-      \item разрешить экспортировать типы с конструкторами
-      \item зависимые типы вроде \( f : \{A\ B : Set\}\{n : Nat\} \rightarrow Vec\ A\ n \rightarrow
-         Vec\ B\ n \rightarrow Vec\ (A \times B)\ n \)
-         могут быть экспортированы, если \(n\) не используется внутри \(f\)
-      \item есть трюк, позволяющий экспортировать типы вроде \( f : \{A : Set\}(n : Nat) \rightarrow A \rightarrow Vec\ a\ n \)
+      \item Если \texttt{n} не используется внутри \texttt{f}, то
+         \begin{align*}
+         &\texttt{f : \{A B : Set\}\{n : Nat\} \(\rightarrow\) Vec A n \(\rightarrow\)}\\
+         &\texttt{\ \ \ Vec B n \(\rightarrow\) Vec (A \(\times\) B) n}
+         \end{align*}
+         эмулируется без проблем.
+      \item есть трюк, позволяющий эмулировать типы вроде
+         \[\texttt{f : \{A : Set\}(n : Nat) \(\rightarrow\) A \(\rightarrow\) Vec A n}\]
+      \item \dots
    \end{enumerate}
 }
 
 \frame {
-   \frametitle{Gotchas}
+   \frametitle{Сложности}
    \begin{itemize}
-      \item termination checking, totality
+      \item В Agda все функции должны быть полными и завершающимися.
+         \begin{align*}
+            &\texttt{f : \{A\ B : Set\}(g : A \(\rightarrow\) B)(proof : Bijection g)
+               \(\rightarrow\)}\\
+            &\texttt{\ \ \ B \(\rightarrow\) A}
+         \end{align*}
+         Что делать, если мы передадим \texttt{g}, которая зацикливается?
+      \item На самом деле в Agda могут быть не завершающиеся функции с
+         использованием коиндукции.
    \end{itemize}
 }
 
