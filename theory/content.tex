@@ -120,17 +120,18 @@ It also works seamlessly with parametrized modules and, consequently, with recor
 
 Two things to watch for:
 \begin{itemize}
-\item \texttt{newtype} wrappers in the first case
-\item The third case
+\item \texttt{newtype} wrappers preserve internal invariants of underlying Agda datatype.
+\item Transformation from Church polymorphism to Curry polymorphism.
 \end{itemize}
-Every other case is exactly the same.
-
-TODO:
+In every other case type is exactly the same.
 
 \section{Preserving term interface}
 
+\(Wrap\) clearly deals with the issue of passing and skipping type parameters with
+MAlonzo-generated code.
 
-\texttt{unsafeCoerce} is legal because it's either:
+A thing to watch for is \texttt{unsafeCoerce}.
+It is legal because it's either:
 \begin{itemize}
 \item The same term(when its type is a type variable)
 \item A newtype around MAlonzo generated type
