@@ -7,9 +7,9 @@ I need to prove that haskell types and terms that I expose wouldn't break the sy
       term must be usable with generated one; and primitives(numbers, strings, ... and their ops) are the same.
 \end{enumerate}
 
-\section{Preserving type invariants}
+\section{My transformations}
 
-Conversion for kinds:
+Transformation for kinds:
 \[ KT\llbracket Kind \rrbracket = HaskellKind \]
 
 \begin{align*}
@@ -20,7 +20,7 @@ Conversion for kinds:
    KT\llbracket \_ \rrbracket &= \bot
 \end{align*}
 
-Conversion for types:
+Transformation for types:
 \[ TT\llbracket AgdaType \rrbracket(Context) = HaskellType \]
 
 \begin{align*}
@@ -38,18 +38,32 @@ Conversion for types:
       \quad x \not\in freevars(T_2) \\
    TT\llbracket \_ \rrbracket(\Gamma) &= \bot\\
 \end{align*}
-Two things to watch for:
-\begin{itemize}
-\item \texttt{newtype} wrappers in the first case
-\item The third case
-\end{itemize}
-Every other case is exactly the same.
 
-TODO:
+Transformation for datatype declaration:
+\begin{align*}
+   &DT\llbracket AgdaType \rrbracket = HaskellTypeDeclaration\\
+   &DTMA\llbracket AgdaType \rrbracket = HaskellType,
+      \quad \text{--- MAlonzo transformation}
+\end{align*}
 
-\section{Preserving term interface}
+Observing two declarations:
+\begin{align*}
+   &\textbf{data } AgdaDataType\ (A_1 : Kind_1) \cdots (A_n : Kind_n) :
+      Kind_{n+1} \rightarrow \cdots \rightarrow Kind_{m} \rightarrow Set \textbf{ where } \ldots\\
+   &\textbf{record } AgdaRecordType\ (A_1 : Kind_1) \cdots (A_n : Kind_n) :
+      Set \textbf{ where } \ldots\\
+\end{align*}
 
-Conversion for terms:
+\begin{align*}
+   &DT\llbracket AgdaDataType \rrbracket = \textbf{newtype } HaskellType\ (a_0 :: KT\llbracket Kind_1 \rrbracket)
+      \cdots (a_m :: KT\llbracket Kind_m \rrbracket)\\
+   &\quad\quad = HaskellType\ (\forall b_0 \cdots b_k.\ DTMA\llbracket AgdaDataType \rrbracket\ b_0\ \cdots\ b_k)\\
+   &DT\llbracket AgdaRecordType \rrbracket = \textbf{newtype } HaskellType\ (a_0 :: KT\llbracket Kind_1 \rrbracket)
+      \cdots (a_n :: KT\llbracket Kind_n \rrbracket)\\
+   &\quad\quad = HaskellType\ (\forall b_0 \cdots b_k.\ DTMA\llbracket AgdaRecordType \rrbracket\ b_0\ \cdots\ b_k)\\
+\end{align*}
+
+Transformation for terms:
 \begin{align*}
    &Wrap\llbracket AgdaType \rrbracket(MAlonzoTerm) = MyTerm\\
    &Unwrap\llbracket AgdaType \rrbracket(MyTerm) = MAlonzoTerm
@@ -74,6 +88,20 @@ Both are only valid when \(TT\llbracket AgdaType \rrbracket(\varnothing) \neq \b
       (Unwrap\llbracket T_1 \rrbracket(term_1),\ Unwrap\llbracket T_2 \rrbracket(term_2))\\
    Unwrap\llbracket \_ \rrbracket(term) &= \bot\\
 \end{align*}
+
+\section{Preserving type invariants}
+
+Two things to watch for:
+\begin{itemize}
+\item \texttt{newtype} wrappers in the first case
+\item The third case
+\end{itemize}
+Every other case is exactly the same.
+
+TODO:
+
+\section{Preserving term interface}
+
 
 \texttt{unsafeCoerce} is legal because it's either:
 \begin{itemize}
