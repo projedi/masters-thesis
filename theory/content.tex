@@ -72,27 +72,21 @@ It also works for \textbf{record}s.
 
 \subsection{Terms}
 
-\(Wrap,\ Unwrap\) are defined only when \(TT\llbracket AgdaType \rrbracket(\varnothing)\) is defined.
+\(Wrap\) is defined only when \(TT\llbracket AgdaType \rrbracket(\varnothing)\) is defined.
 
 \begin{align*}
-   &Wrap\llbracket AgdaType \rrbracket(MAlonzoTerm) = MyTerm\\
-   &Unwrap\llbracket AgdaType \rrbracket(MyTerm) = MAlonzoTerm
+   &Wrap^{2k}\llbracket AgdaType \rrbracket(MAlonzoTerm) = MyTerm\\
+   &Wrap^{2k + 1}\llbracket AgdaType \rrbracket(MyTerm) = MAlonzoTerm
 \end{align*}
 
 \begin{align*}
-   Wrap\llbracket A\ args\ldots \rrbracket(term) &= \texttt{unsafeCoerce } term\\
-   Wrap\llbracket (A : Kind) \rightarrow T \rrbracket(term) &= Wrap\llbracket T \rrbracket(term\ ())\\
-   Wrap\llbracket (x : T_1) \rightarrow T_2 \rrbracket(term) &=
-      \lambda x.\ Wrap\llbracket T_2 \rrbracket(term\ Unwrap\llbracket T_1 \rrbracket(x))\\
-   Wrap\llbracket (x : T_1,\ T_2) \rrbracket((term_1,\ term_2)) &=
-      (Wrap\llbracket T_1 \rrbracket(term_1),\ Wrap\llbracket T_2 \rrbracket(term_2))\\
-   \\
-   Unwrap\llbracket A\ args\ldots \rrbracket(term) &= \texttt{unsafeCoerce } term\\
-   Unwrap\llbracket (A : Kind) \rightarrow T \rrbracket(term) &= Unwrap\llbracket T \rrbracket(\lambda \_.\ term)\\
-   Unwrap\llbracket (x : T_1) \rightarrow T_2 \rrbracket(term) &=
-      \lambda x.\ Unwrap\llbracket T_2 \rrbracket(term\ Wrap\llbracket T_1 \rrbracket(x))\\
-   Unwrap\llbracket (x : T_1,\ T_2) \rrbracket((term_1,\ term_2)) &=
-      (Unwrap\llbracket T_1 \rrbracket(term_1),\ Unwrap\llbracket T_2 \rrbracket(term_2))\\
+   Wrap^k\llbracket A\ args\ldots \rrbracket(term) &= \texttt{unsafeCoerce } term\\
+   Wrap^{2k}\llbracket (A : Kind) \rightarrow T \rrbracket(term) &= Wrap^{2k}\llbracket T \rrbracket(term\ ())\\
+   Wrap^{2k+1}\llbracket (A : Kind) \rightarrow T \rrbracket(term) &= Wrap^{2k+1}\llbracket T \rrbracket(\lambda \_.\ term)\\
+   Wrap^k\llbracket (x : T_1) \rightarrow T_2 \rrbracket(term) &=
+      \lambda x.\ Wrap^k\llbracket T_2 \rrbracket(term\ Wrap^{k+1}\llbracket T_1 \rrbracket(x))\\
+   Wrap^k\llbracket (x : T_1,\ T_2) \rrbracket((term_1,\ term_2)) &=
+      (Wrap^k\llbracket T_1 \rrbracket(term_1),\ Wrap^k\llbracket T_2 \rrbracket(term_2))
 \end{align*}
 
 \subsection{Value declarations}
@@ -116,7 +110,7 @@ Considering declaration:
 \begin{align*}
    &VTD\llbracket AgdaName \rrbracket \doteq\\
    &\quad VT\llbracket AgdaName \rrbracket :: TT\llbracket AgdaType \rrbracket(\varnothing)\\
-   &\quad VT\llbracket AgdaName \rrbracket = Wrap\llbracket AgdaType \rrbracket(VTMA\llbracket AgdaName \rrbracket)\\
+   &\quad VT\llbracket AgdaName \rrbracket = Wrap^0\llbracket AgdaType \rrbracket(VTMA\llbracket AgdaName \rrbracket)\\
 \end{align*}
 
 It works in the same way for constructors.
