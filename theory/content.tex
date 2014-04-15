@@ -142,9 +142,20 @@ In every other case type is exactly the same.
 MAlonzo-generated code.
 
 A thing to watch for is \texttt{unsafeCoerce}.
-It is legal because it's either:
-\begin{itemize}
-\item The same term(when its type is a type variable)
-\item A newtype around MAlonzo generated type
-\item A primitive
-\end{itemize}
+There are three cases for a coerced type:
+\begin{enumerate}
+\item a \texttt{newtype} wrapper around an MAlonzo-generated datatype
+\item a primitive as defined by \(PTMA\)
+\item \(a\ args\ldots\), where \(a\) is a type variable
+\end{enumerate}
+
+The first one is safely coercible because \texttt{newtype} is required to have the same
+internal structure as its wrapped type.
+
+In the second case type of MAlonzo-generated code is the same as ours by construction.
+
+Lastly, because of \(\Gamma\) in \(TT\) we guarantee that type \(a\) can be assigned to
+a term that had type \(A\) in Agda when and only when \((A \mapsto a) \in \Gamma\). Therefore we
+\texttt{unsafeCoerce} to \(a\ args\ldots\) only from corresponding \(A\ args\ldots\).
+This ensures that terms with type \(a\ args\ldots\) have the same internal structure
+which is the best we can do for such a polymorphic type.
