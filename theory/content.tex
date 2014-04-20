@@ -1,6 +1,6 @@
 \section{Intro}
 
-I need to prove that haskell types and terms that I expose wouldn't break the system.  It means two things:
+I need to prove that Haskell types and terms that I expose wouldn't break the system.  It means two things:
 \begin{enumerate}
 \item Types preserve the same set of invariants
 \item Terms have the same interface: any combination of \texttt{APPLY} that can be used(ignoring types) to original
@@ -124,7 +124,7 @@ Considering declaration:
    &\quad\quad VT\llbracket AgdaName \rrbracket = Wrap^0\llbracket AgdaType \rrbracket(VTMA\llbracket AgdaName \rrbracket)\\
 \end{align*}
 
-It works in the same way for constructors.
+It works in the same way for constructors(it exports them as Haskell functions - not Haskell constructors).
 It also works seamlessly with parametrized modules and, consequently, with record functions.
 
 \section{Preserving type invariants}
@@ -144,18 +144,17 @@ MAlonzo-generated code.
 A thing to watch for is \texttt{unsafeCoerce}.
 There are three cases for a coerced type:
 \begin{enumerate}
-\item a \texttt{newtype} wrapper around an MAlonzo-generated datatype
-\item a primitive as defined by \(PTMA\)
-\item \(a\ args\ldots\), where \(a\) is a type variable
+\item a \texttt{newtype} wrapper around an MAlonzo-generated datatype.
+
+   Safe because \texttt{newtype} is required to have the same
+   internal structure as its wrapped type.
+\item a primitive as defined by \(PTMA\).
+
+   Safe because type of MAlonzo-generated code is the same as ours by construction.
+\item \(a\ args\ldots\), where \(a\) is a type variable.
+
+   Safe because all terms with type \(a\ args\ldots\) will have the same internal
+   structure. That's because from Haskell side compiler will guarantee that and
+   from Agda side terms will have a corresponding type \(A\ args\ldots\) (via \(\Gamma\) in \(TT\))
+   so the compiler will guarantee it too.
 \end{enumerate}
-
-The first one is safely coercible because \texttt{newtype} is required to have the same
-internal structure as its wrapped type.
-
-In the second case type of MAlonzo-generated code is the same as ours by construction.
-
-Lastly, because of \(\Gamma\) in \(TT\) we guarantee that type \(a\) can be assigned to
-a term that had type \(A\) in Agda when and only when \((A \mapsto a) \in \Gamma\). Therefore we
-\texttt{unsafeCoerce} to \(a\ args\ldots\) only from corresponding \(A\ args\ldots\).
-This ensures that terms with type \(a\ args\ldots\) have the same internal structure
-which is the best we can do for such a polymorphic type.
