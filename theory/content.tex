@@ -129,12 +129,44 @@ It also works seamlessly with parametrized modules and, consequently, with recor
 
 \section{Preserving type invariants}
 
-Two things to watch for:
-\begin{itemize}
-\item \texttt{newtype} wrappers preserve internal invariants of underlying Agda datatype.
+Three cases:
+\begin{enumerate}
+\item \texttt{newtype} wrappers.
+
+
+
 \item Transformation from Church polymorphism to Curry polymorphism.
+
+\begin{align*}
+&(A : Kind) \rightarrow Type \\
+&(\forall a :: KT\llbracket Kind \rrbracket).\ HaskellType
+\end{align*}
+
+They both mean the same thing but the first one always requires a proof that
+\(Kind\) is inhabited:
+
+\begin{itemize}
+\item If \(A \not\in freevars(Type)\) and, by construction(\(TT\)), \(a \not\in freevars(HaskellType)\).
+\item \(A\) (and consequently \(a\)) is a phantom type(i.e. only used as a type parameter).
 \end{itemize}
-In every other case type is exactly the same.
+
+In both cases Haskell will completely ignore the inhabitance of \(KT\llbracket Kind \rrbracket\).
+Agda however will require you to provide an evidence that \(Kind\) can be constructed. Now,
+\(Kind\) is defined as a combination of \(Set_0\) and arrows. Therefore some \(Kind\ A\) can be viewed as
+follows: \(Arg_1 \rightarrow \ldots \rightarrow Arg_n \rightarrow Set_0\) for \(n \ge 0\).
+Let's define a simple \(Unit\) type:
+\begin{align*}
+   &\mathbf{data}\ Unit : Set\ \mathbf{where}\\
+   &\quad unit : Unit
+\end{align*}
+
+We can now construct an \(A\): \(A = \lambda arg_1 \ldots arg_n.\ Unit\). Therefore, each \(Kind\)
+is inhabited and we can safely omit this proof in our transformation.
+
+\item In every other case type is exactly the same.
+
+So invariants are clearly the same.
+\end{enumerate}
 
 \section{Preserving term interface}
 
