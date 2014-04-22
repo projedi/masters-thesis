@@ -1,0 +1,90 @@
+\frame {
+   \frametitle{MAlonzo}
+   \begin{align*}
+      &\mathbf{data}\texttt{ Vec (A : Set) : Nat \(\rightarrow\) Set }\mathbf{where}\\
+      &\texttt{\ \ \ nil : Vec A 0}\\
+      &\texttt{\ \ \ cons : \{n : Nat\} \(\rightarrow\) A \(\rightarrow\) Vec A n
+         \(\rightarrow\) Vec A (n + 1)}\\
+      &\texttt{vec-map : \{A B : Set\}\{n : Nat\} \(\rightarrow\) (A \(\rightarrow\) B)
+         \(\rightarrow\)}\\
+      &\texttt{\ \ \ Vec A n \(\rightarrow\) Vec B n}\\
+      &\texttt{vec-map f nil = nil}\\
+      &\texttt{vec-map f (cons x xs) = cons (f x) (vec-map f xs)}\\
+      \\
+      &\mathbf{data}\texttt{ T1 a0 a1 a2 = C2 | C3 a0 a1 a2}\\
+      &\texttt{d4 v0 v1 v2 v3 (C2) = cast C2}\\
+      &\texttt{d4 v0 v1 v2 v3 (C3 v4 v5 v6) = cast
+         (C3\ (cast v4) \dots)}\\
+      &\mathbf{ghci}\texttt{>:t d4}\\
+      &\texttt{d4 :: a \(\rightarrow\) a1 \(\rightarrow\) a2
+         \(\rightarrow\) a3 \(\rightarrow\) (T1 t t1 t2) \(\rightarrow\) b}
+   \end{align*}
+}
+
+\frame {
+   \frametitle{Что хочется}
+   \begin{block}{Идея}
+   Нужно сохранить инварианты, поддерживаемые системой типов.
+   \vspace{1em}
+   \begin{enumerate}
+   \item Экспортируем весь код в Haskell с помощью MAlonzo.
+   \item
+      Для выбранных имен пытаемся найти соответствующие типы на Haskell
+      и генерируем обертки над скомпилированным кодом.
+   \end{enumerate}
+   \end{block}
+}
+
+\frame {
+   \frametitle{Реализованное решение}
+   Указание на <<экспорт>> дается с помощью прагм\\
+   \texttt{\{-\# EXPORT agda-name haskell-name \#-\}}
+
+   \begin{itemize}
+   \item \[\mathbf{data}\texttt{ T (A : Set) : Set \(\rightarrow\) Set }\mathbf{where}\ \ldots\]
+      вместе с \texttt{\{-\# EXPORT T Th \#-\}} породит
+      \[\mathbf{newtype}\texttt{ Th (a0 :: *) (a1 :: *) = <hidden>}\]
+   \item 
+      \begin{align*}
+         &\texttt{f : \{A : Set\} \(\rightarrow\) (\{B : Set\} \(\rightarrow\) B) \(\rightarrow\) A}\\
+         &\texttt{f = \ldots}
+      \end{align*}
+      вместе с \texttt{\{-\# EXPORT f fh \#-\}} породит
+      \begin{align*}
+         &\texttt{fh :: \(\forall\)(a0 :: *). (\(\forall\)(a1 :: *). a1) \(\rightarrow\) a0}\\
+         &\texttt{fh = \ldots}
+      \end{align*}
+   \end{itemize}
+}
+
+\frame {
+   \frametitle{Coq}
+   \begin{align*}
+      &\mathbf{data}\texttt{ Vec a = Nil | Cons Nat a (Vec a)}\\
+      \\
+      &\texttt{vecMap :: Nat \(\rightarrow\) (a1 \(\rightarrow\) a2) \(\rightarrow\)
+         Vec a1 \(\rightarrow\) Vec a2}\\
+      &\texttt{vecMap n f v =}\\
+      &\ \ \ \mathbf{case}\ \texttt{v}\ \mathbf{of}\\
+      &\texttt{\ \ \ \ Nil \(\rightarrow\) Nil}\\
+      &\texttt{\ \ \ \ Cons n0 x xs \(\rightarrow\) Cons n0 (f x)
+         (vecMap n0 f xs)}\\
+   \end{align*}
+}
+
+\frame {
+   \frametitle{Agda next}
+   \begin{align*}
+      &\texttt{f : \{A : Set\} \(\rightarrow\) (\{B : Set\} \(\rightarrow\) B) \(\rightarrow\) A}\\
+      &\texttt{f = \ldots}
+   \end{align*}
+   вместе с \texttt{\{-\# COMPILED\_EXPORT f fh \#-\}} породит
+   \begin{align*}
+      &\texttt{fh :: \(\forall\)a0. () \(\rightarrow\) (\(\forall\)b0. () \(\rightarrow\) b0) \(\rightarrow\) a0}\\
+      &\texttt{fh = \ldots}
+   \end{align*}
+}
+
+\frame {
+   \center{\Huge Q\&A}
+}
