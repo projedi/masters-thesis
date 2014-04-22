@@ -1,19 +1,4 @@
 \frame {
-   \frametitle{Coq}
-   \begin{align*}
-      &\mathbf{data}\texttt{ Vec a = Nil | Cons Nat a (Vec a)}\\
-      \\
-      &\texttt{vecMap :: Nat \(\rightarrow\) (a1 \(\rightarrow\) a2) \(\rightarrow\)
-         Vec a1 \(\rightarrow\) Vec a2}\\
-      &\texttt{vecMap n f v =}\\
-      &\ \ \ \mathbf{case}\ \texttt{v}\ \mathbf{of}\\
-      &\texttt{\ \ \ \ Nil \(\rightarrow\) Nil}\\
-      &\texttt{\ \ \ \ Cons n0 x xs \(\rightarrow\) Cons n0 (f x)
-         (vecMap n0 f xs)}\\
-   \end{align*}
-}
-
-\frame {
    \frametitle{MAlonzo}
    \begin{align*}
       &\mathbf{data}\texttt{ Vec (A : Set) : Nat \(\rightarrow\) Set }\mathbf{where}\\
@@ -33,6 +18,21 @@
       &\mathbf{ghci}\texttt{>:t d4}\\
       &\texttt{d4 :: a \(\rightarrow\) a1 \(\rightarrow\) a2
          \(\rightarrow\) a3 \(\rightarrow\) (T1 t t1 t2) \(\rightarrow\) b}
+   \end{align*}
+}
+
+\frame {
+   \frametitle{Coq}
+   \begin{align*}
+      &\mathbf{data}\texttt{ Vec a = Nil | Cons Nat a (Vec a)}\\
+      \\
+      &\texttt{vecMap :: Nat \(\rightarrow\) (a1 \(\rightarrow\) a2) \(\rightarrow\)
+         Vec a1 \(\rightarrow\) Vec a2}\\
+      &\texttt{vecMap n f v =}\\
+      &\ \ \ \mathbf{case}\ \texttt{v}\ \mathbf{of}\\
+      &\texttt{\ \ \ \ Nil \(\rightarrow\) Nil}\\
+      &\texttt{\ \ \ \ Cons n0 x xs \(\rightarrow\) Cons n0 (f x)
+         (vecMap n0 f xs)}\\
    \end{align*}
 }
 
