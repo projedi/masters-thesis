@@ -1,17 +1,21 @@
 \frame {
+   \fontsize{9pt}{11.2}\selectfont
    \frametitle{MAlonzo}
    \begin{align*}
       &\mathbf{data}\texttt{ Vec (A : Set) : Nat \(\rightarrow\) Set }\mathbf{where}\\
       &\texttt{\ \ \ nil : Vec A 0}\\
       &\texttt{\ \ \ cons : \{n : Nat\} \(\rightarrow\) A \(\rightarrow\) Vec A n
          \(\rightarrow\) Vec A (n + 1)}\\
+      \\
       &\texttt{vec-map : \{A B : Set\}\{n : Nat\} \(\rightarrow\) (A \(\rightarrow\) B)
-         \(\rightarrow\)}\\
-      &\texttt{\ \ \ Vec A n \(\rightarrow\) Vec B n}\\
+         \(\rightarrow\) Vec A n \(\rightarrow\) Vec B n}\\
       &\texttt{vec-map f nil = nil}\\
       &\texttt{vec-map f (cons x xs) = cons (f x) (vec-map f xs)}\\
       \\
+      &\mbox{MAlonzo генерирует:}\\
+      \\
       &\mathbf{data}\texttt{ T1 a0 a1 a2 = C2 | C3 a0 a1 a2}\\
+      \\
       &\texttt{d4 v0 v1 v2 v3 (C2) = cast C2}\\
       &\texttt{d4 v0 v1 v2 v3 (C3 v4 v5 v6) = cast
          (C3\ (cast v4) \dots)}\\
