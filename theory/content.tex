@@ -133,7 +133,13 @@ Three cases:
 \begin{enumerate}
 \item \texttt{newtype} wrappers.
 
-
+A datatype can be viewed as a logical statement and its constructors --- as
+proofs of this statement. \texttt{newtype} wrapping gives us a statement but
+hides proofs. Acquiring an instance of this datatype in Haskell can only be done
+when some Agda function returns it. Therefore it was constructed with all the invariants
+checked by Agda. We can only use this datatype with functions exported from Agda that
+used the original version of it. Therefore all the internal invariants are safely passed
+from Agda to Agda invisibly through Haskell.
 
 \item Transformation from Church polymorphism to Curry polymorphism.
 
