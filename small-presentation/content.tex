@@ -16,9 +16,9 @@
       \\
       &\mathbf{data}\texttt{ T1 a0 a1 a2 = C2 | C3 a0 a1 a2}\\
       \\
-      &\texttt{d4 v0 v1 v2 v3 (C2) = cast C2}\\
-      &\texttt{d4 v0 v1 v2 v3 (C3 v4 v5 v6) = cast
-         (C3\ (cast v4) \dots)}\\
+      &\texttt{d4 v0 v1 v2 v3 (C2) = unsafeCoerce C2}\\
+      &\texttt{d4 v0 v1 v2 v3 (C3 v4 v5 v6) = unsafeCoerce
+         (C3\ (unsafeCoerce v4) \dots)}\\
       &\mathbf{ghci}\texttt{>:t d4}\\
       &\texttt{d4 :: a \(\rightarrow\) a1 \(\rightarrow\) a2
          \(\rightarrow\) a3 \(\rightarrow\) (T1 t t1 t2) \(\rightarrow\) b}
