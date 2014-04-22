@@ -32,14 +32,14 @@ I need to prove that Haskell types and terms that I expose wouldn't break the sy
 
 Considering declaration:
 \begin{align*}
-   &\textbf{data } AgdaDataType\ (A_1 : Kind_1) \cdots (A_n : Kind_n) :
-      Kind_{n+1} \rightarrow \cdots \rightarrow Kind_{m} \rightarrow Set \textbf{ where } \ldots
+   &\textbf{data } AgdaDataType\ (A_1 : Kind_1) \cdots (A_m : Kind_m) :
+      Kind_{m+1} \rightarrow \cdots \rightarrow Kind_n \rightarrow Set \textbf{ where } \ldots
 \end{align*}
 
 \begin{align*}
    &DTD\llbracket AgdaDataType \rrbracket \doteq\\
    &\quad\textbf{newtype } DT\llbracket AgdaDataType \rrbracket\ (a_0 :: KT\llbracket Kind_1 \rrbracket)
-      \cdots (a_m :: KT\llbracket Kind_m \rrbracket)\\
+      \cdots (a_n :: KT\llbracket Kind_n \rrbracket)\\
    &\quad\quad = DT\llbracket AgdaRecordType \rrbracket\ (\forall b_0 \cdots b_k.\ DTMA\llbracket AgdaDataType \rrbracket\ b_0\ \cdots\ b_k)
 \end{align*}
 
