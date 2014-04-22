@@ -93,11 +93,11 @@
    \frametitle{Data}
    \[\mathbf{data}\texttt{ Type (A : Set \(\rightarrow\) Set) : Set \(\rightarrow\) Set }\mathbf{where}\ \ldots \]
    MAlonzo:
-   \[\mathbf{data}\texttt{ T1 a0 \ldots\ ak = \ldots}\]
+   \[\mathbf{data}\texttt{ T1 a0 \(\cdots\)\ ak = \ldots}\]
    Сгенерировано при \texttt{\{-\# EXPORT Type HType \#-\}}:
    \begin{align*}
       &\mathbf{newtype}\texttt{ HType (a0 :: * \(\rightarrow\) *) (a1 :: *) = }\\
-      &\quad\texttt{HType (\(\forall\) b1 \ldots\ bk. T1 b1 \ldots\ bk)}
+      &\quad\texttt{HType (\(\forall\) b1 \(\cdots\)\ bk. T1 b1 \(\cdots\)\ bk)}
    \end{align*}
 }
 
