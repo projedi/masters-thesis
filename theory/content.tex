@@ -3,7 +3,7 @@
 \subsection{Goal}
 
 As of Agda 2.3.2.2 there is a way to call Haskell code from Agda but no way to call Agda code from Haskell:
-that is to compile Agda code into a library to be used from Haskell.
+i.e. to compile Agda code into a library usable from Haskell.
 
 The feature is desirable because one can create a formally verified library in Agda, create a simple API
 around it and then use it in Haskell for real world applications.
@@ -12,25 +12,42 @@ around it and then use it in Haskell for real world applications.
 
 \subsubsection{As of Agda 2.3.2.2}
 
-There is a compiler from Agda to Haskell called MAlonzo(TODO: Add a link to a paper of Alonzo compiler and mention that
-MAlonzo is just a rewrite of Alonzo, possibly add a link to a post on a mailing list about it) - it translates Agda code
+There is a compiler from Agda to Haskell called MAlonzo\cite{MAlonzo}(which is
+a rewrite of Alonzo\cite{Alonzo} compiler) - it translates Agda code
 into a Haskell code so that observable behaviour of running an Agda interpreter and generated Haskell code is the same.
 
-Because of its focus on generating executables it generates unusable names for functions and datatypes, it does not
-generate type signatures(which results in useless types for functions) and datatype generation completely ignores
-type parameters.
+MAlonzo focuses on generating executables and therefore it has some undesirable characteristics:
+\begin{itemize}
+\item Names for functions and datatypes are of the form: a letter + a magic number
+\item Type signatures for functions are not written
+\item Generated datatypes omit all type parameters
+\end{itemize}
 
-All of that makes it unusable as a library generator.
+On the other hand, apart from datatype parameters nothing is omitted:
+even arguments that represent proofs are carried(but are replaced with \texttt{()} type)
+
+Still, at this state using generated code from Haskell is not pleasant.
 
 \subsubsection{Since Agda 2.3.4}
 
-New \texttt{\{-\# COMPILED\_EXPORT \(AgdaName\) \(HaskellName\) \#-\}} pragma that will force the
-MAlonzo compiler to use \(HaskellName\) instead of a generated name for \(AgdaName\) function and will
-also generate an explicit type signature for \(HaskellName\) according to the rules: TODO: add MAlonzo rules.
+New \texttt{\{-\# COMPILED\_EXPORT \(AgdaName\) \(HaskellName\) \#-\}} pragma is added.
+It will force the MAlonzo compiler to use \(HaskellName\) instead of a generated name for \(AgdaName\) function and will
+also generate an explicit type signature for \(HaskellName\) according to the rules:
+
+\begin{align*}
+   T\llbracket Set\ A \rrbracket &= Unit\\
+   T\llbracket x\ As \rrbracket &= x\ T\llbracket As \rrbracket\\
+   T\llbracket (x : A) \rightarrow B \rrbracket &= \forall x.  \ T\llbracket A \rrbracket
+      \rightarrow T\llbracket B \rrbracket,\quad x \in freevars(B)\\
+   T\llbracket (x : A) \rightarrow B \rrbracket &= T\llbracket A \rrbracket
+      \rightarrow T\llbracket B \rrbracket,\quad otherwise\\
+   T\llbracket k\ As \rrbracket &= T\ T\llbracket As \rrbracket,\quad \texttt{COMPILED\_TYPE}\ k\ T\\
+   T\llbracket k\ As \rrbracket &= Unit,\quad \texttt{COMPILED}\ k\ E
+\end{align*}
 
 Also MAlonzo gained the ability to generate a Haskell library - not only an executable.
 
-It helps usability but is not quite enough: it should also produce better datatypes.
+While improving the experience it still lacks better datatype generation.
 
 \subsection{The scope of this work}
 
@@ -39,18 +56,40 @@ This work was developed on Agda 2.3.2.2 and features of 2.3.4 were not available
 The \texttt{\{-\# EXPORT \(AgdaName\) \(HaskellName\) \#-\}} pragma is introduced which
 will create a wrapper named \(HaskellName\) for MAlonzo generated code for \(AgdaName\) function or datatype.
 
-TODO: enumerate features: type signature generation, newtype wrappers around datatypes, primitives, compiled types
+The primary motivation is exposing functions with such types that using them in any legitimate way
+from Haskell(i.e. no \texttt{unsafeCoerce} and such) will not break any internal invariant in Agda
+code. It automatically means that only functions with types that can be expressed in Haskell can be
+exposed - otherwise we lose information and invariants as a consequence.
 
-\section{Old Intro}
+Also for convenience Church polymorphism is converted to Curry polymorphism:
+instead of(as can be seen in Agda 2.3.4)
+\[
+   TT\llbracket (A : Set) \rightarrow B \rrbracket = \forall a.\ () \rightarrow TT\llbracket B \rrbracket
+\]
+this holds
+\[
+   TT\llbracket (A : Set) \rightarrow B \rrbracket = \forall a.\ TT\llbracket B \rrbracket.
+\]
 
-I need to prove that Haskell types and terms that I expose wouldn't break the system.  It means two things:
+Overview of features:
 \begin{enumerate}
-\item Types preserve the same set of invariants
-\item Terms have the same interface: any combination of \texttt{APPLY} that can be used(ignoring types) to original
-      term must be usable with generated one; and primitives(numbers, strings, ... and their ops) are the same.
+\item Functions with types expressed in Haskell can be exported and will
+      undergo Church to Curry polymorphism transformation.
+\item Datatypes can be exported as abstract datatypes when their type
+      parameters are of types equivalent to kinds in Haskell(a combination
+      of \(Set_0\) and arrows).
+\item Constructors of this datatypes can be exported as Haskell functions
+      (i.e. loosing the ability to pattern match on them) via feature 1.
+\item Some Agda primitives: \texttt{INTEGER}, \texttt{FLOAT}, \texttt{CHAR},
+      \texttt{STRING}, \texttt{IO} will be exported as \(Int,\ Float,\ Char,\ String,\ IO\)
+      respectively.
+\item \texttt{COMPILED\_TYPE}s will be exported accordingly.
 \end{enumerate}
 
-\section{My transformations}
+Section \ref{sec:wrappers} gives formal definition of wrappers generated,
+section \ref{sec:proofs} gives proofs that exposed interface will not break the system.
+
+\section{Wrapper generation}\label{sec:wrappers}
 
 \subsection{Kinds}
 \[ KT\llbracket Kind \rrbracket = HaskellKind \]
@@ -170,7 +209,18 @@ Considering declaration:
 It works in the same way for constructors(it exports them as Haskell functions - not Haskell constructors).
 It also works seamlessly with parametrized modules and, consequently, with record functions.
 
-\section{Preserving type invariants}
+\section{Proofs}\label{sec:proofs}
+
+\subsection{Old Intro}
+
+I need to prove that Haskell types and terms that I expose wouldn't break the system.  It means two things:
+\begin{enumerate}
+\item Types preserve the same set of invariants
+\item Terms have the same interface: any combination of \texttt{APPLY} that can be used(ignoring types) to original
+      term must be usable with generated one; and primitives(numbers, strings, ... and their ops) are the same.
+\end{enumerate}
+
+\subsection{Preserving type invariants}
 
 Three cases:
 \begin{enumerate}
@@ -217,7 +267,7 @@ is inhabited and we can safely omit this proof in our transformation.
 So invariants are clearly the same.
 \end{enumerate}
 
-\section{Preserving term interface}
+\subsection{Preserving term interface}
 
 \(Wrap\) clearly deals with the issue of passing and skipping type parameters with
 MAlonzo-generated code.
@@ -240,3 +290,17 @@ A thing to watch for is \texttt{unsafeCoerce}.  There are three cases for a coer
    from Agda side terms will have a corresponding type \(A\ args\ldots\) (via \(\Gamma\) in \(TT\))
    so the compiler will guarantee it too.
 \end{enumerate}
+
+\begin{thebibliography}{9}
+\bibitem{MAlonzo}
+   Makoto Takeyama,
+   \emph{a new compiler MAlonzo}.
+   \url{http://thread.gmane.org/gmane.comp.lang.agda/62},
+   2008.
+
+\bibitem{Alonzo}
+   Marcin Benke,
+   \emph{Alonzo --- a compiler for Agda}.
+   TYPES2007,
+   2007.
+\end{thebibliography}
