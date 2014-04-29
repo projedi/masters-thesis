@@ -37,12 +37,18 @@ also generate an explicit type signature for \(HaskellName\) according to the ru
 \begin{align*}
    T\llbracket Set\ A \rrbracket &= Unit\\
    T\llbracket x\ As \rrbracket &= x\ T\llbracket As \rrbracket\\
-   T\llbracket (x : A) \rightarrow B \rrbracket &= \forall x.  \ T\llbracket A \rrbracket
-      \rightarrow T\llbracket B \rrbracket,\quad x \in freevars(B)\\
-   T\llbracket (x : A) \rightarrow B \rrbracket &= T\llbracket A \rrbracket
-      \rightarrow T\llbracket B \rrbracket,\quad otherwise\\
-   T\llbracket k\ As \rrbracket &= T\ T\llbracket As \rrbracket,\quad \texttt{COMPILED\_TYPE}\ k\ T\\
-   T\llbracket k\ As \rrbracket &= Unit,\quad \texttt{COMPILED}\ k\ E
+   T\llbracket (x : A) \rightarrow B \rrbracket &= \left\{
+      \begin{array}{l l}
+         \forall x.  \ T\llbracket A \rrbracket
+            \rightarrow T\llbracket B \rrbracket &\quad x \in freevars(B)\\
+         T\llbracket A \rrbracket
+            \rightarrow T\llbracket B \rrbracket &\quad otherwise
+      \end{array}\right.\\
+   T\llbracket k\ As \rrbracket &= \left\{
+      \begin{array}{l l}
+         T\ T\llbracket As \rrbracket &\quad \texttt{COMPILED\_TYPE}\ k\ T\\
+         Unit &\quad \texttt{COMPILED}\ k\ E
+      \end{array}\right.
 \end{align*}
 
 Also MAlonzo gained the ability to generate a Haskell library - not only an executable.
@@ -147,19 +153,23 @@ MAlonzo gives the following \(PTMA\) transformation:
 \end{align*}
 
 \begin{align*}
-   TT\llbracket A\ args\ldots \rrbracket(\Gamma) &= a\ TT\llbracket args\ldots \rrbracket(\Gamma),
-      \quad (A \mapsto a) \in \Gamma \\
-   TT\llbracket CT\ args\ldots \rrbracket(\Gamma) &= CT\ TT\llbracket args\ldots \rrbracket(\Gamma),
-      \quad CT\text{ is a \texttt{COMPILED\_TYPE}}\\
-   TT\llbracket PT\ args\ldots \rrbracket(\Gamma) &= PTMA\llbracket PT \rrbracket\ TT\llbracket args\ldots \rrbracket(\Gamma) \\
-   TT\llbracket ET\ args\ldots \rrbracket(\Gamma) &= DT\llbracket ET \rrbracket \ TT\llbracket args\ldots \rrbracket(\Gamma)\\
+   TT\llbracket T\ args\ldots \rrbracket(\Gamma) &= \left\{
+      \begin{array}{l l}
+         a\ TT\llbracket args\ldots \rrbracket(\Gamma) &\quad (T \mapsto a) \in \Gamma \\
+         CT\ TT\llbracket args\ldots \rrbracket(\Gamma) &\quad
+            \text{when \texttt{\{-\# COMPILED\_TYPE \(T\) \(CT\) \#-\}} is specified}\\
+         PTMA\llbracket T \rrbracket\ TT\llbracket args\ldots \rrbracket(\Gamma) &\quad
+            \text{when \(PTMA\llbracket T \rrbracket\) is defined}\\
+         DT\llbracket T \rrbracket\ TT\llbracket args\ldots \rrbracket(\Gamma) &\quad
+            \text{when \(DT\llbracket T \rrbracket\) is defined}\\
+      \end{array}\right.\\
    TT\llbracket (A : Kind) \rightarrow T \rrbracket(\Gamma) &= \forall (a :: KT\llbracket Kind \rrbracket).
       \ TT\llbracket T \rrbracket(\Gamma \cup \{A \mapsto a\})\\
    TT\llbracket (x : T_1) \rightarrow T_2 \rrbracket(\Gamma) &=
-      TT\llbracket T_1 \rrbracket(\Gamma) \rightarrow TT\llbracket T_2 \rrbracket(\Gamma),
+      TT\llbracket T_1 \rrbracket(\Gamma) \rightarrow TT\llbracket T_2 \rrbracket(\Gamma)
       \quad x \not\in freevars(T_2) \\
    TT\llbracket (x : T_1,\ T_2) \rrbracket(\Gamma) &=
-      (TT\llbracket T_1 \rrbracket(\Gamma),\ TT\llbracket T_2 \rrbracket(\Gamma)),
+      (TT\llbracket T_1 \rrbracket(\Gamma),\ TT\llbracket T_2 \rrbracket(\Gamma))
       \quad x \not\in freevars(T_2) \\
 \end{align*}
 
