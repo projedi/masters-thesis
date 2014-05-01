@@ -24,7 +24,7 @@ MAlonzo focuses on generating executables and therefore it has some undesirable 
 \end{itemize}
 
 On the other hand, apart from datatype parameters nothing is omitted:
-even arguments that represent proofs are carried(but are replaced with \texttt{()} type)
+even arguments that represent proofs are carried(but are replaced with \(()\) type)
 
 Still, at this state using generated code from Haskell is not pleasant.
 
@@ -67,29 +67,27 @@ from Haskell(i.e. no \texttt{unsafeCoerce} and such) will not break any internal
 code. It automatically means that only functions with types that can be expressed in Haskell can be
 exposed - otherwise we lose information and invariants as a consequence.
 
-Also for convenience Church polymorphism is converted to Curry polymorphism:
-instead of(as can be seen in Agda 2.3.4)
-\[
-   TT\llbracket (A : Set) \rightarrow B \rrbracket = \forall a.\ () \rightarrow TT\llbracket B \rrbracket
-\]
-this holds
-\[
-   TT\llbracket (A : Set) \rightarrow B \rrbracket = \forall a.\ TT\llbracket B \rrbracket.
-\]
-
 Overview of features:
 \begin{enumerate}
 \item Functions with types expressed in Haskell can be exported and will
-      undergo Church to Curry polymorphism transformation.
+      undergo Church to Curry polymorphism transformation:
+      instead of(as can be seen in Agda 2.3.4)
+      \[
+         TT\llbracket (A : Set) \rightarrow B \rrbracket = \forall a.\ () \rightarrow TT\llbracket B \rrbracket
+      \]
+      this holds
+      \[
+         TT\llbracket (A : Set) \rightarrow B \rrbracket = \forall a.\ TT\llbracket B \rrbracket.
+      \]
 \item Datatypes can be exported as abstract datatypes when their type
       parameters are of types equivalent to kinds in Haskell(a combination
-      of \(Set_0\) and arrows).
-\item Constructors of this datatypes can be exported as Haskell functions
+      of \(Set_0\) and arrows).\\
+      Constructors of this datatypes can be exported as Haskell functions
       (i.e. loosing the ability to pattern match on them) via feature 1.
-\item Some Agda primitives: \texttt{INTEGER}, \texttt{FLOAT}, \texttt{CHAR},
+\item Some Agda builtins: \texttt{INTEGER}, \texttt{FLOAT}, \texttt{CHAR},
       \texttt{STRING}, \texttt{IO} will be exported as \(Int,\ Float,\ Char,\ String,\ IO\)
       respectively.
-\item \texttt{COMPILED\_TYPE}s will be exported accordingly.
+\item \texttt{COMPILED\_TYPE} \(AgdaType\) \(HaskellType\) will be exported as \(HaskellType\).
 \end{enumerate}
 
 Section \ref{sec:wrappers} gives formal definition of wrappers generated,
