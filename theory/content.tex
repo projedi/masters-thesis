@@ -226,13 +226,18 @@ It also works seamlessly with parametrized modules and, consequently, with recor
 
 \section{Proofs}\label{sec:proofs}
 
-\subsection{Old Intro}
+\subsection{What does it mean not to break the system}
 
-I need to prove that Haskell types and terms that I expose wouldn't break the system.  It means two things:
 \begin{enumerate}
-\item Types preserve the same set of invariants
-\item Terms have the same interface: any combination of \texttt{APPLY} that can be used(ignoring types) to original
-      term must be usable with generated one; and primitives(numbers, strings, ... and their ops) are the same.
+\item Types describe a set of invariants. Therefore types exported from Agda to Haskell
+      should refer to the same set.
+\item There is a lot of \texttt{unsafeCoerce} which means there is a potential to use
+      \texttt{APPLY} not on a function, to pass a wrong datatype to a function(and thus failing during
+      pattern matching) and to use some primitive operation on
+      a wrong builtin type(e.g. on \texttt{STRING} instead of \texttt{INTEGER}).
+      Therefore all functions and its arguments should preserve the arity during the export;
+      datatypes should be exported to some type that contains exactly the term Agda code produced;
+      no Agda type can be exported into two different types(automatically solves the builtin problem).
 \end{enumerate}
 
 \subsection{Preserving type invariants}
