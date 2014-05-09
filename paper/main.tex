@@ -8,6 +8,7 @@
 \usepackage{indentfirst} % always indent the first paragraph after section
 \usepackage{stmaryrd}
 \usepackage{hyperref}
+\usepackage[nottoc,numbib]{tocbibind} % include bibliography in the table of contents
 
 \begin{document}
 
@@ -15,6 +16,14 @@
 
 \tableofcontents
 
+\newpage
 \input{content.tex}
+
+\newpage
+\input{bibliography.tex}
+
+\appendix
+\newpage
+\input{appendix.tex}
 
 \end{document}
