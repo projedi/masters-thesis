@@ -31,11 +31,41 @@ Agda\footnote{\url{http://wiki.portal.chalmers.se/agda/pmwiki.php?n=Main.HomePag
 
 \subsection{Цель}
 
+Разработать способ вызывать код, написанный на Agda, из Haskell.
+
 \subsection{Существующие решения}
+
+\subsubsection{Для Coq}
+
+Coq очень похож на Agda и поэтому имеет смысл сравнивать их технологии.
+
+Техника называется <<экстракция программ>>\cite{Let02}.
+По программам на Coq генерируются программы на OCaml, Haskell и Scheme.
+При этом все вычисления, выполняемые только на этапе проверки типов, стираются.
+То есть, все зависимые типы, и, как следствие, доказательства.
+
+\subsubsection{Для Agda}
+
+На Agda есть компилятор
+MAlonzo\footnote{\url{http://thread.gmane.org/gmane.comp.lang.agda/62}}
+(являющийся переписанным компилятором Alonzo\cite{Ben07}), который транслирует
+код на Agda в код на Haskell и затем компилирует его с помощью ghc, получая в
+результате исполняемый файл.
 
 \subsection{Анализ MAlonzo}
 
+TODO: Full description of MAlonzo internals.
+
 \subsection{Задачи}
+
+\begin{enumerate}
+\item Реализовать
+\item ???
+\item PROFIT
+\end{enumerate}
+
+TODO: Mention somewhere that the goal is to create a system
+TODO: that does not break invariants set up by Agda.
 
 \newpage
 \section{Реализация}
