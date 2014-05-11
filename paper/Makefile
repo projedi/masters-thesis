@@ -1,5 +1,7 @@
-paper.pdf: main.tex content.tex title.tex appendix.tex bibliography.tex
+.PHONY: all clean
+
+all:
 	latexmk -jobname=paper -latexoption=-halt-on-error -pdf main.tex
 
 clean:
-	rm paper.pdf
+	rm -f paper.aux paper.fdb_latexmk paper.fls paper.log paper.out paper.pdf paper.toc
