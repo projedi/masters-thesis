@@ -44,7 +44,47 @@ Coq\footnote{\url{http://coq.inria.fr}}, похожего на Agda, и озна
 
 \subsection{Цель}
 
-Разработать способ вызывать код, написанный на Agda, из Haskell.
+Разработать способ вызывать код, написанный на Agda, из Haskell, не нарушая
+внутренних инвариантов, установленных Agda.
+
+Про сохранение внутренних инвариантов нужно объяснить подробнее. Рассмотрим пример:
+\begin{align*}
+&\mathbf{data}\ Nat : Set\ \mathbf{where}\\
+&\quad zero : Nat\\
+&\quad succ : Nat \rightarrow Nat\\
+\\
+&\mathbf{data}\ List\ (A : Set) : Set\ \mathbf{where}\\
+&\quad nil : List\ A\\
+&\quad cons : A \rightarrow List\ A \rightarrow List\ A\\
+\\
+&length : \forall\ \{A\} \rightarrow List\ A \rightarrow Nat\\
+&length\ nil = zero\\
+&length\ (cons\ \_\ xs) = succ\ (length\ xs)\\
+\\
+&\mathbf{data}\ Fin : Nat \rightarrow Set\ \mathbf{where}\\
+&\quad finzero : \forall\ \{n\} \rightarrow Fin\ (succ\ n)\\
+&\quad finsucc : \forall\ \{n\} \rightarrow Fin\ n \rightarrow Fin\ (succ\ n)\\
+\\
+&elemAt : \forall\ \{A\}\ (xs : List\ A) \rightarrow Fin\ (length\ xs) \rightarrow A\\
+&elemAt\ nil\ ()\\
+&elemAt\ (cons\ x\ \_)\ finzero = x\\
+&elemAt\ (cons\ \_\ xs)\ (finsucc\ n) = elemAt\ xs\ n
+\end{align*}
+
+В этом коде определяются три типа данных: натуральныe числа,
+список и конечные числа (тип \(Fin\ n\) имеют числа, меньшие \(n\)) и
+2 функции: длина списка и получение элемента из списка по индексу.
+Рассмотрим вторую функцию. Она принимает 2 аргумента: список и число,
+меньшее длины списка. Это гарантирует, что элемент с таким индексом
+существует. Этот инвариант используется в самом первом клозе:
+при попытке написать код для пустого списка, Agda замечает, что нет способа
+построить терм с типом \(Fin\ zero\) и поэтому можно написать \(()\) вместо тела
+и система типов гарантирует, что \(elemAt\) никогда не будет вызвана с
+аргументом \(nil\).
+
+При экстракции в Haskell хочется сохранить это свойство. Но эта функция
+использует зависимые типы, которые не получится воспроизвести на Haskell.
+Поэтому, нужно запретить вызывать эту функцию из внешнего кода.
 
 \subsection{Существующие решения}
 
