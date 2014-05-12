@@ -11,7 +11,7 @@ Agda\footnote{\url{http://wiki.portal.chalmers.se/agda/pmwiki.php?n=Main.HomePag
 
 \subsection{TODO: Зависимые типы?}
 
-\subsection{Экстракция кода}
+\subsection{Экстракция кода}\label{sec:intro-extraction}
 
 Термин <<экстракция программ>> пришел из языка/cистемы доказательства теорем
 Coq\footnote{\url{http://coq.inria.fr}}, похожего на Agda, и означает генерацию функционального кода
@@ -42,7 +42,7 @@ Coq\footnote{\url{http://coq.inria.fr}}, похожего на Agda, и озна
 \newpage
 \section{Постановка задачи}
 
-\subsection{Цель}
+\subsection{Цель}\label{sec:task-goal}
 
 Разработать способ вызывать код, написанный на Agda, из Haskell, не нарушая
 внутренних инвариантов, установленных Agda.
@@ -90,12 +90,18 @@ Coq\footnote{\url{http://coq.inria.fr}}, похожего на Agda, и озна
 
 \subsubsection{Для Coq}
 
-Coq очень похож на Agda и поэтому имеет смысл сравнивать их технологии.
+Как было сказано в пункте \ref{sec:intro-extraction} в Coq есть технология
+<<экстракции программ>>. Но текущая реализация стирает все зависимые типы и
+код аналогичный \ref{sec:task-goal} будет преобразован в: TODO: actually test with Coq
+\begin{align*}
+&\dots\\
+&\mathbf{data}\ Fin = FinZero\ |\ FinSucc\ Fin\\
+&elemAt :: List\ a \rightarrow Fin \rightarrow a\\
+&\dots
+\end{align*}
 
-Техника называется <<экстракция программ>>\cite{Let02}.
-По программам на Coq генерируются программы на OCaml, Haskell и Scheme.
-При этом все вычисления, выполняемые только на этапе проверки типов, стираются.
-То есть, все зависимые типы, и, как следствие, доказательства.
+И теперь можно вызвать \(elemAt\) от пустого списка и получить ошибку на
+этапе выполнения, что нежелательно.
 
 \subsubsection{Для Agda}
 
