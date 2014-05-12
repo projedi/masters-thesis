@@ -108,8 +108,17 @@ Coq\footnote{\url{http://coq.inria.fr}}, похожего на Agda, и озна
 На Agda есть компилятор
 MAlonzo\footnote{\url{http://thread.gmane.org/gmane.comp.lang.agda/62}}
 (являющийся переписанным компилятором Alonzo\cite{Ben07}), который транслирует
-код на Agda в код на Haskell и затем компилирует его с помощью ghc, получая в
-результате исполняемый файл.
+код на Agda в код на Haskell и затем компилирует его с помощью
+ghc\footnote{\url{http://www.haskell.org/ghc/}} (де-факто стандарт Haskell),
+получая в результате исполняемый файл.
+
+Из-за фокуса на генерацию исполняемых файлов, а не библиотек
+генерируемый код создает имена вида буква+число, для функций
+не выписывается их тип и типы данных теряют типовые параметры.
+TODO: example. Это делает использование сгенерированного кода
+практически неприменимым.
+
+TODO: A note about Agda 2.3.4 which actually goes forward with supporting libraries
 
 \subsection{Анализ MAlonzo}
 
