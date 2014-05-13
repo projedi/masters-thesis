@@ -14,8 +14,8 @@ Agda\footnote{\url{http://wiki.portal.chalmers.se/agda/pmwiki.php?n=Main.HomePag
 \subsection{Экстракция кода}\label{sec:intro-extraction}
 
 Термин <<экстракция программ>> пришел из языка/cистемы доказательства теорем
-Coq\footnote{\url{http://coq.inria.fr}}, похожего на Agda, и означает генерацию функционального кода
-из доказательств \cite{Let02}.
+Coq\footnote{\url{http://coq.inria.fr}}, похожего на Agda, и означает генерацию
+функционального кода из доказательств \cite{Let02}.
 
 \subsection{Применение экстракции}
 
@@ -94,12 +94,55 @@ Coq\footnote{\url{http://coq.inria.fr}}, похожего на Agda, и озна
 
 Как было сказано в пункте \ref{sec:intro-extraction} в Coq есть технология
 <<экстракции программ>>. Но текущая реализация стирает все зависимые типы и
-код аналогичный \ref{sec:task-goal} будет преобразован в: TODO: actually test with Coq
+код аналогичный \ref{sec:task-goal}: (TODO: I'm having trouble implementing elemAt in Coq)
+
 \begin{align*}
-&\dots\\
-&\mathbf{data}\ Fin = FinZero\ |\ FinSucc\ Fin\\
-&elemAt :: List\ a \rightarrow Fin \rightarrow a\\
-&\dots
+&\mathbf{Inductive}\ Nat : Set :=\\
+&\ |\ zero : Nat\\
+&\ |\ succ : Nat \rightarrow Nat.\\
+\\
+&\mathbf{Inductive}\ List\ (A : Type) : Type :=\\
+&\ |\ nil : List\ A\\
+&\ |\ cons : A \rightarrow List\ A \rightarrow List\ A.\\
+\\
+&\mathbf{Fixpoint}\ length\ (A : Type)\ (xs : List\ A)\ \{struct\ xs\} : Nat :=\\
+&\quad\mathbf{match}\ xs\ \mathbf{with}\\
+&\quad\ |\ nil \Rightarrow zero\\
+&\quad\ |\ cons\ \_\ xs' \Rightarrow succ\ (length\ \_\ xs')\\
+&\quad\mathbf{end}.\\
+\\
+&\mathbf{Inductive}\ Fin : Nat \rightarrow Set :=\\
+&\ |\ finzero : \mathbf{forall}\ n : Nat,\ Fin\ (succ\ n)\\
+&\ |\ finsucc : \mathbf{forall}\ n : Nat,\ Fin\ n \rightarrow Fin\ (succ\ n).\\
+\\
+&\mathbf{Lemma}\ emptyfin : \mathbf{forall}\ f : Fin\ zero,\ False.\\
+&\mathbf{Proof}.\ intros\ H;\ inversion\ H.\ \mathbf{Qed}.\\
+\\
+&\mathbf{Fixpoint}\ elemAt\ (A : Type)\ (xs : List\ A)\ (n : Fin\ (length\ \_\ xs)) : A :=\\
+&\quad\mathbf{match}\ xs,\ n\ \mathbf{with}\\
+&\quad\ |\ nil,\ \_ \Rightarrow \mathbf{match}\ emptyfin\ n\ \mathbf{with\ end}\\
+&\quad\ |\ cons\ x\ \_,\ finzero\ \_ \Rightarrow x\\
+&\quad\ |\ cons\ \_\ xs',\ finsucc\ \_\ n' \Rightarrow elemAt\ \_\ xs'\ n'
+\ (*\text{ TODO: This case fails }*)
+\end{align*}
+
+будет преобразован в:
+\begin{align*}
+&\mathbf{data}\ Nat = Zero\ |\ Succ\ Nat\\
+\\
+&\mathbf{data}\ List\ a = Nil\ |\ Cons\ a\ (List\ a)\\
+\\
+&length :: List\ a1 \rightarrow Nat\\
+&length\ Nil = Zero\\
+&length\ (Cons\ a\ xs') = Succ\ (length\ xs')\\
+\\
+&\mathbf{data}\ Fin = Finzero\ Nat\ |\ Finsucc\ Nat\ Fin\\
+\\
+&\texttt{--- TODO: Was not able to implement correctly in Coq}\\
+&elemAt :: List\ a1 \rightarrow Fin \rightarrow a1\\
+&elemAt\ Nil\ n = \texttt{error}\ "absurd\ case"\\
+&elemAt\ (Cons\ x\ \_)\ (Finzero\ \_) = x\\
+&elemAt\ (Cons\ \_\ xs')\ (Finsucc\ \_\ n') = elemAt\ xs'\ n'
 \end{align*}
 
 И теперь можно вызвать \(elemAt\) от пустого списка и получить ошибку на
