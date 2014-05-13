@@ -78,13 +78,15 @@ Coq\footnote{\url{http://coq.inria.fr}}, похожего на Agda, и озна
 меньшее длины списка. Это гарантирует, что элемент с таким индексом
 существует. Этот инвариант используется в самом первом клозе:
 при попытке написать код для пустого списка, Agda замечает, что нет способа
-построить терм с типом \(Fin\ zero\) и поэтому можно написать \(()\) вместо тела
-и система типов гарантирует, что \(elemAt\) никогда не будет вызвана с
-аргументом \(nil\).
+построить терм с типом \(Fin\ zero\) и поэтому вместо тела пишется \(()\).
+А так как система типов гарантирует, что этот клоз не будет вызван, то
+никакой ошибки на этапе исполнения быть не может.
 
-При экстракции в Haskell хочется сохранить это свойство. Но эта функция
+При экстракции в Haskell хочется сохранить это свойство. Но \(elemAt\)
 использует зависимые типы, которые не получится воспроизвести на Haskell.
-Поэтому, нужно запретить вызывать эту функцию из внешнего кода.
+Код, сгенерированный из Agda, будет поддерживать это свойство, но для
+внешнего кода дать гарантий не получится. Поэтому, необходимо запретить
+вызов этой функции.
 
 \subsection{Существующие решения}
 
@@ -112,11 +114,47 @@ MAlonzo\footnote{\url{http://thread.gmane.org/gmane.comp.lang.agda/62}}
 ghc\footnote{\url{http://www.haskell.org/ghc/}} (де-факто стандарт Haskell),
 получая в результате исполняемый файл.
 
-Из-за фокуса на генерацию исполняемых файлов, а не библиотек
+Из-за фокуса на генерацию исполняемых файлов, а не библиотек,
 генерируемый код создает имена вида буква+число, для функций
 не выписывается их тип и типы данных теряют типовые параметры.
-TODO: example. Это делает использование сгенерированного кода
+Пример из \ref{sec:task-goal} преобразуется приблизительно в:
+
+\begin{align*}
+&name1 = "Main.Nat"\\
+&name2 = "Main.Nat.zero"\\
+&name3 = "Main.Nat.zero"\\
+&d1 = ()\\
+&\mathbf{data}\ T1\ a0 = C2\ |\ C3\ a0\\
+\\
+&name5 = "Main.List"\\
+&name7 = "Main.List.nil"\\
+&name8 = "Main.List.cons"\\
+&d5\ a0 = ()\\
+&\mathbf{data}\ T5\ a0\ a1 = C7\ |\ C8\ a0\ a1\\
+\\
+&name10 = "Main.length"\\
+&d10\ v0\ C7 = \texttt{unsafeCoerce}\ C2\\
+&d10\ v0\ (C8\ v1\ v2) = \texttt{unsafeCoerce}\ (C3\ (\texttt{unsafeCoerce}\\
+&\quad(d10\ (\texttt{unsafeCoerce}\ v0)\ (\texttt{unsafeCoerce}\ v1))))\\
+\\
+&name12 = "Main.Fin"\\
+&name14 = "Main.Fin.finzero"\\
+&name16 = "Main.Fin.finsucc"\\
+&d12\ a0 = ()\\
+&\mathbf{data}\ T12\ a0\ a1 = C14\ a0\ |\ C16\ a0\ a1\\
+\\
+&name19 = "Main.elemAt"\\
+&d19\ \_\ C7\ \_ = \texttt{error}\ "Impossible\ clause\ body"\\
+&d19\ v0\ (C8\ v1\ v2)\ (C14\ v3) = \texttt{unsafeCoerce}\ v1\\
+&d19\ v0\ (C8\ v1\ v2)\ (C16\ v3\ v4) = \texttt{unsafeCoerce}\ (d19\\
+&\quad(\texttt{unsafeCoerce}\ v0)\ (\texttt{unsafeCoerce}\ v2)\ (
+   \texttt{unsafeCoerce}\ v4))
+\end{align*}
+
+Как видно, это делает использование сгенерированного кода
 практически неприменимым.
+
+\paragraph{Замечание об Agda 2.3.4}
 
 TODO: A note about Agda 2.3.4 which actually goes forward with supporting libraries
 
