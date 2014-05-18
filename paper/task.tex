@@ -5,7 +5,12 @@
 Разработать способ вызывать код, написанный на Agda, из Haskell, не нарушая
 внутренних инвариантов, установленных Agda.
 
-Про сохранение внутренних инвариантов нужно объяснить подробнее. Рассмотрим пример:
+\subsection{Сохранение внутренних инвариантов}
+
+\subsubsection{Скрытие зависимых типов}
+
+Рассмотрим пример:
+
 \begin{align*}
 &\mathbf{module}\ Main\ \mathbf{where}\\
 \\
@@ -47,7 +52,57 @@
 использует зависимые типы, которые не получится воспроизвести на Haskell.
 Код, сгенерированный из Agda, будет поддерживать это свойство, но для
 внешнего кода дать гарантий не получится. Поэтому, необходимо запретить
-вызов этой функции.
+вызов этой функции извне.
+
+\subsubsection{Скрытие конструкторов типов данных}
+
+Рассмотрим пример:
+
+\begin{align*}
+&\mathbf{data}\ \bot\ \mathbf{where}\\
+\\
+&\mathbf{data}\ \_\equiv\_\ \{A : Set\}\ (x : A) : A \rightarrow Set\ \mathbf{where}\\
+&\quad refl : x \equiv x\\
+\\
+&\_\not\equiv\_ : \{A : Set\} \rightarrow A \rightarrow A \rightarrow Set\\
+&x \not\equiv y = x \equiv y \rightarrow \bot\\
+\\
+&\mathbf{data}\ IsEqual\ (A : Set) : Set\ \mathbf{where}\\
+&\quad yes : (x\ y : A) \rightarrow x \equiv y \rightarrow IsEqual\ A\\
+&\quad no : (x\ y : A) \rightarrow x \not\equiv y \rightarrow IsEqual\ A\\
+\\
+&someFunction_1 : SomeType \rightarrow IsEqual\ Nat\\
+&someFunction_1 = \cdots\\
+\\
+&someFunction_2 : SomeOtherType \rightarrow IsEqual\ Nat \rightarrow YetAnotherType\\
+&someFunction_2 = \cdots
+\end{align*}
+
+В примере задаются 4 типа: пустой тип, равенство, неравенство
+(как отрицание равенства) и тип проверки на равенство. У последнего
+в конструкторах содержатся соответствующие доказательства. Из-за этого
+невозможно полностью этот тип представить в Haskell. Но если сделать этот
+тип абстрактным (скрыть конструкторы), то его станет можно использовать из
+Haskell: построение с помощью \(someFunction_1\) и использование с помощью
+\(someFunction_2\).
+
+\subsubsection{Обработка простых типов}
+
+С другой стороны, такие простые типы как \(Nat\), \(List\) и
+функция \(length\) могут быть напрямую представлены в Haskell:
+
+\begin{align*}
+&\mathbf{data}\ Nat = Zero\ |\ Succ\ Nat\\
+\\
+&\mathbf{data}\ List\ a = Nil\ |\ Cons\ a\ (List\ a)\\
+\\
+&length :: List\ a \rightarrow Nat\\
+&length\ Nil = Zero\\
+&length\ (Cons\ \_\ xs) = Succ\ (length\ xs)
+\end{align*}
+
+Несмотря на это, типы \(Nat\) и \(List\) все равно будут выставлены
+как абстрактные типы. Причина раскрывается в TODO: ref to a reason
 
 \subsection{Существующие решения}
 
