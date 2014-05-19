@@ -96,7 +96,7 @@ S_{m+1} \rightarrow \cdots \rightarrow S_n \rightarrow Set_0\ \mathbf{where}\ \d
 термом, выставленным наружу, имеющим соответствующий тип \(HaskellName\ args\dots\)
 можно использовать \texttt{unsafeCoerce}, так как \textbf{newtype} гарантирует
 идентичное внутреннее представление. Как будет видно в
-\ref{sec:implementation-functions}, это очень удобно и является причиной
+\ref{sec:implementation-wrappers}, это очень удобно и является причиной
 почему все типы данных выставляются как \textbf{newtype} обертки.
 
 \subsubsection{Функции}\label{sec:implementation-functions}
@@ -111,18 +111,19 @@ S_{m+1} \rightarrow \cdots \rightarrow S_n \rightarrow Set_0\ \mathbf{where}\ \d
 &(x : T_1,\ T_2),\quad x \not\in freevars(T_2)
 \end{align*}
 
-На Haskell последние три будут иметь вид
+\paragraph{\(\Pi\) и \(\Sigma\) типы с неиспользуемыми аргументами}
+На Haskell будут иметь вид
 \begin{align*}
-&X\ args\dots\\
 &T_1 \rightarrow T_2\\
 &(T_1,\ T_2),
 \end{align*}
 то есть абсолютно эквивалентны оригинальным.
 
-Для первого может быть 2 способа:
+\paragraph{Объявление типового параметра}
+Для \((A : S) \rightarrow T\) рассмотрим 2 способа:
 \begin{enumerate}
 \item \( \forall a.\ () \rightarrow T \)
-\item \( \forall a.\ T \)
+\item \( \forall (a :: K).\ T,\quad K\) --- \(S\), где \(Set_0\) заменяется на \(*\)
 \end{enumerate}
 
 Первый используется в Agda 2.3.4, как описано в \ref{text:agda-compiled-export}.
@@ -134,5 +135,32 @@ MAlonzo при генерации кода. С другой стороны, вт
 естественным при использовании из Haskell, но требует написания оберток над
 кодом, сгенерированным MAlonzo, которые будут выполнять преобразование между
 2-мя типами.
+
+\paragraph{Типовой атом}
+Разбивается на 4 случая:
+\begin{enumerate}
+\item \textbf{Типовой параметр}
+
+Заменяется на переменную из соответствующего объявления
+\item \textbf{<<Экспортированный>> тип}
+
+Заменяется на тип, в который экспортировали
+\item \textbf{<<Импортированный>> тип}
+
+Заменяется на тип, из которого импортировали с помощью \texttt{COMPILED\_DATA} или
+\texttt{COMPILED\_TYPE}
+\item \textbf{Встроенный тип}
+
+Встроенные типы, получаемые из постулатов: \texttt{INTEGER}, \texttt{FLOAT},
+\texttt{CHAR}, \texttt{STRING}, \texttt{IO} - заменяются соответственно на
+\(Int\), \(Float\), \(Char\), \(String\), \(IO\), так как MAlonzo использует
+ровно эти типы вместо постулатов.
+
+Встроенные типы вроде \texttt{LIST} в MAlonzo просто получают функции
+по преобразованию между \([]\) и типом, сгенерированным по обычным правилам
+и таким образом эквивалентны генерированию экспорту типов вместе с конструкторами.
+\end{enumerate}
+
+\subsubsection{Обертки для функций}\label{sec:implementation-wrappers}
 
 TODO: Why there is no EXPORT of types with constructors and builtins with constructors.
