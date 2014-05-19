@@ -139,7 +139,8 @@ Haskell: построение с помощью \(someFunction_1\) и испол
 &\quad\ |\ nil,\ \_ \Rightarrow \mathbf{match}\ emptyfin\ n\ \mathbf{with\ end}\\
 &\quad\ |\ cons\ x\ \_,\ finzero\ \_ \Rightarrow x\\
 &\quad\ |\ cons\ \_\ xs',\ finsucc\ \_\ n' \Rightarrow elemAt\ \_\ xs'\ n'
-\ (*\text{ TODO: This case fails }*)
+\ (*\text{ TODO: This case fails }*)\\
+&\quad\mathbf{end}.
 \end{align*}
 
 будет преобразован в:
