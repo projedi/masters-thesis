@@ -101,4 +101,38 @@ S_{m+1} \rightarrow \cdots \rightarrow S_n \rightarrow Set_0\ \mathbf{where}\ \d
 
 \subsubsection{Функции}\label{sec:implementation-functions}
 
-Полиморфизм по-Черчу преобразуется в полиморфизм по-Карри.
+Типы функций \(T\), представимые в Haskell, имеют следующий вид:
+\begin{align*}
+&(A : S) \rightarrow T,\quad\text{\(S\) состоит из \(Set_0\) и \(\rightarrow\)}\\
+&X\ args\dots,\quad\text{\(args\) представимы и \(X\) --- типовой параметр,
+тип из \ref{sec:implementation-datatypes},}\\
+&\qquad\text{FFI-импортированный тип или встроенный тип}\\
+&(x : T_1) \rightarrow T_2,\quad x \not\in freevars(T_2)\\
+&(x : T_1,\ T_2),\quad x \not\in freevars(T_2)
+\end{align*}
+
+На Haskell последние три будут иметь вид
+\begin{align*}
+&X\ args\dots\\
+&T_1 \rightarrow T_2\\
+&(T_1,\ T_2),
+\end{align*}
+то есть абсолютно эквивалентны оригинальным.
+
+Для первого может быть 2 способа:
+\begin{enumerate}
+\item \( \forall a.\ () \rightarrow T \)
+\item \( \forall a.\ T \)
+\end{enumerate}
+
+Первый используется в Agda 2.3.4, как описано в \ref{text:agda-compiled-export}.
+Второй --- в данной работе.
+
+Добавление аргумента \(()\) делает терм более похожим на Agda, так как в ней
+требуется передача типового аргумента терму и этот способ используется в
+MAlonzo при генерации кода. С другой стороны, второй способ является более
+естественным при использовании из Haskell, но требует написания оберток над
+кодом, сгенерированным MAlonzo, которые будут выполнять преобразование между
+2-мя типами.
+
+TODO: Why there is no EXPORT of types with constructors and builtins with constructors.
