@@ -113,40 +113,50 @@ Haskell: построение с помощью \(someFunction_1\) и испол
 Как было сказано в пункте \ref{sec:intro-extraction} в Coq есть технология
 <<экстракции программ>>. Но текущая реализация стирает все зависимые типы и
 код аналогичный \ref{text:task-agda-code}:
-(TODO: I'm having trouble implementing elemAt in Coq)
 
 \begin{align*}
-&\mathbf{Inductive}\ Nat : Set :=\\
-&\ |\ zero : Nat\\
-&\ |\ succ : Nat \rightarrow Nat.\\
+&\mathbf{Inductive}\ Nat : Set :=
+   |\ zero : Nat\ |\ succ : Nat \rightarrow Nat.\\
+&\mathbf{Conjecture}\ succ\_zero : \mathbf{forall}\ n,\ succ\ n = zero \rightarrow
+   False.\\
+&\mathbf{Definition}\ succ\_succ\ \{n1\}\ \{n2\}\ (e : succ\ n1 = succ\ n2) :
+   n1 = n2 :=\\
+&\quad\mathbf{match}\ e\ \mathbf{with}\ |\ eq\_refl \Rightarrow
+   eq\_refl\ \mathbf{end}.\\
 \\
 &\mathbf{Inductive}\ List\ (A : Type) : Type :=\\
-&\ |\ nil : List\ A\\
-&\ |\ cons : A \rightarrow List\ A \rightarrow List\ A.\\
-\\
-&\mathbf{Fixpoint}\ length\ (A : Type)\ (xs : List\ A)\ \{struct\ xs\} : Nat :=\\
+&|\ nil : List\ A\\
+&|\ cons : A \rightarrow List\ A \rightarrow List\ A.\\
+&\mathbf{Fixpoint}\ length\ \{A\}\ (xs : List\ A)\ \{struct\ xs\} : Nat :=\\
 &\quad\mathbf{match}\ xs\ \mathbf{with}\\
-&\quad\ |\ nil \Rightarrow zero\\
-&\quad\ |\ cons\ \_\ xs' \Rightarrow succ\ (length\ \_\ xs')\\
+&\quad|\ nil \Rightarrow zero\\
+&\quad|\ cons\ \_\ xs' \Rightarrow succ\ (length\ xs')\\
 &\quad\mathbf{end}.\\
 \\
 &\mathbf{Inductive}\ Fin : Nat \rightarrow Set :=\\
-&\ |\ finzero : \mathbf{forall}\ n : Nat,\ Fin\ (succ\ n)\\
-&\ |\ finsucc : \mathbf{forall}\ n : Nat,\ Fin\ n \rightarrow Fin\ (succ\ n).\\
+&|\ finzero : \mathbf{forall}\ n : Nat,\ Fin\ (succ\ n)\\
+&|\ finsucc : \mathbf{forall}\ n : Nat,\ Fin\ n \rightarrow Fin\ (succ\ n).\\
+&\mathbf{Definition}\ finofzero\ \{n\}\ (f : Fin\ n) : n = zero \rightarrow False :=\\
+&\quad\mathbf{match}\ f\ \mathbf{with}\\
+&\quad|\ finzero\ \_ \Rightarrow \mathbf{fun}\ e \Rightarrow succ\_zero\ \_\ e\\
+&\quad|\ finsucc\ \_\ \_ \Rightarrow \mathbf{fun}\ e \Rightarrow succ\_zero\ \_\ e\\
+&\quad\mathbf{end}.\\
 \\
-&\mathbf{Lemma}\ emptyfin : \mathbf{forall}\ f : Fin\ zero,\ False.\\
-&\mathbf{Proof}.\ intros\ H;\ inversion\ H.\ \mathbf{Qed}.\\
+&\mathbf{Fixpoint}\ elemAt'\ \{A\}\ \{n\}\ (xs : List\ A)\ (i : Fin\ n) :
+   n = length\ xs \rightarrow A :=\\
+&\quad\mathbf{match}\ xs,\ i\ \mathbf{with}\\
+&\quad|\ nil,\ \_ \Rightarrow \mathbf{fun}\ (e : n = length\ (nil\ \_))
+   \Rightarrow \mathbf{match}\ finofzero\ i\ e\ \mathbf{with\ end}\\
+&\quad|\ cons\ x\ \_,\ finzero\ \_ \Rightarrow \mathbf{fun}\ \_ \Rightarrow x\\
+&\quad|\ cons\ \_\ xs',\ finsucc\ \_\ i' \Rightarrow \mathbf{fun}\ e \Rightarrow
+   elemAt'\ xs'\ i'\ (succ\_succ\ e)\\
+&\quad\mathbf{end}.\\
 \\
-&\mathbf{Fixpoint}\ elemAt\ (A : Type)\ (xs : List\ A)\ (n : Fin\ (length\ \_\ xs)) : A :=\\
-&\quad\mathbf{match}\ xs,\ n\ \mathbf{with}\\
-&\quad\ |\ nil,\ \_ \Rightarrow \mathbf{match}\ emptyfin\ n\ \mathbf{with\ end}\\
-&\quad\ |\ cons\ x\ \_,\ finzero\ \_ \Rightarrow x\\
-&\quad\ |\ cons\ \_\ xs',\ finsucc\ \_\ n' \Rightarrow elemAt\ \_\ xs'\ n'
-\ (*\text{ TODO: This case fails }*)\\
-&\quad\mathbf{end}.
+&\mathbf{Fixpoint}\ elemAt\ \{A\}\ (xs : List\ A)\ (i : Fin\ (length\ xs)) : A :=\\
+&\quad elemAt'\ xs\ i\ eq\_refl.
 \end{align*}
 
-будет преобразован в:
+будет преобразован примерно в:
 \begin{align*}
 &\mathbf{data}\ Nat = Zero\ |\ Succ\ Nat\\
 \\
@@ -158,11 +168,13 @@ Haskell: построение с помощью \(someFunction_1\) и испол
 \\
 &\mathbf{data}\ Fin = Finzero\ Nat\ |\ Finsucc\ Nat\ Fin\\
 \\
-&\texttt{--- TODO: Was not able to implement correctly in Coq}\\
-&elemAt :: List\ a1 \rightarrow Fin \rightarrow a1\\
-&elemAt\ Nil\ n = \texttt{error}\ "absurd\ case"\\
-&elemAt\ (Cons\ x\ \_)\ (Finzero\ \_) = x\\
-&elemAt\ (Cons\ \_\ xs')\ (Finsucc\ \_\ n') = elemAt\ xs'\ n'
+&elemAt' :: Nat \rightarrow List\ a1 \rightarrow Fin \rightarrow a1\\
+&elemAt'\ \_\ Nil\ \_ = \texttt{error}\ "absurd\ case"\\
+&elemAt'\ \_\ (Cons\ x\ \_)\ (Finzero\ \_) = x\\
+&elemAt'\ \_\ (Cons\ \_\ xs')\ (Finsucc\ n0\ i') = elemAt'\ n0\ xs'\ i'\\
+\\
+&elemAt :: (List\ a1) \rightarrow Fin \rightarrow a1\\
+&elemAt\ xs\ i = elemAt'\ (length\ xs)\ xs\ i
 \end{align*}
 
 И теперь можно вызвать \(elemAt\) от пустого списка и получить ошибку на
