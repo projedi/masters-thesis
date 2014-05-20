@@ -130,6 +130,37 @@
 
 \frame {
    \frametitle{Подробности реализации}
+   \framesubtitle{Типы данных}
+
+   \begin{enumerate}
+   \item \textbf{Тип и конструкторы выразимы}.
+      Можно полностью задать этот тип на Haskell и полноценно его использовать.
+
+      TODO: Need a transformation function when doing function wrappers or
+      TODO: change the way MAlonzo generates this type.
+   \item \textbf{Хотя бы один конструктор не выразим}.
+      В данном случае тип необходимо представить абстракным.
+
+      TODO: Cannot limit ourselves with only available constructors - pattern matching.
+      TODO: A fantastic idea because we have newtypes and can just unsafeCoerce.
+   \item \textbf{Ничего не выразимо}.
+      В таком случае этот тип обязан быть скрыт от использования во внешнем коде.
+   \end{enumerate}
+
+   TODO: trouble with exported as data as a type parameter to exported with
+   newtype
+}
+
+\frame {
+   \frametitle{Подробности реализации}
+   \framesubtitle{Функции}
+
+   Способ реализации параметрического полиморфизма отличается в Agda и в Haskell.
+
+   TODO: Agda needs a type parameter passed into a term. And MAlonzo generates exactly
+   TODO: that. So a programmer would have to manually pass and skip () when calling
+   TODO: this function.
+   TODO: Therefore, it was decided to use wrappers that would do that automatically.
 }
 
 \frame {
