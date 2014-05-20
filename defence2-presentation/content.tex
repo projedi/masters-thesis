@@ -17,7 +17,8 @@
    \begin{itemize}
    \item Один из способов формально верифицировать --- строить формулы достаточно
          мощной логики над элементами программы и проверять их на этапе компиляции.
-   \item Agda позволяет строить формулы на языке предикативной конструктивной логики.
+   \item Agda --- функциональный язык программирования, который позволяет строить
+         формулы на языке предикативной конструктивной логики.
    \end{itemize}
 }
 
@@ -50,7 +51,7 @@
       из программы на Haskell, не нарушая внутренние инварианты, поддерживаемые Agda.
    \end{block}
 
-   Haskell выбран по нескольким причинам:
+   Целевым языком выбран Haskell по нескольким причинам:
    \begin{itemize}
    \item Языки синтаксически похожи
    \item Типы в Haskell --- подмножество типов в Agda
@@ -67,7 +68,7 @@
    \frametitle{Существующие решения}
 
    \begin{description}
-   \item[Coq]
+   \item[Coq 8.4pl3]
       Экстракция программ\footnote{P. Letouzey. \emph{A New Extraction for Coq}. 2002}.
       Генерируется код, из которого стираются все доказательства.
       Но это значит, что некоторые функции, требовавшие инварианты
@@ -104,7 +105,7 @@
 }
 
 \frame {
-   \frametitle{Реализация}
+   \frametitle{Обзор реализации}
 
    \begin{itemize}
    \item Выставляемый интерфейс представляет собой обертки над кодом,
@@ -149,4 +150,12 @@
    \frametitle{EXTRA - Agda 2.3.4 COMPILED\_EXPORT}
 
    TODO: What does it generate?
+}
+
+\frame {
+   \frametitle{EXTRA - Что дальше}
+
+   TODO: Extracting data with constructors
+   TODO: Typeclasses and instances
+   TODO: More dependent type emulation
 }
