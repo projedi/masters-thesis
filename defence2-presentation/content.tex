@@ -95,6 +95,47 @@
 }
 
 \frame {
+   \frametitle{Реализация}
+
+   \begin{itemize}
+   \item Выставляемый интерфейс представляет собой обертки над кодом,
+         сгенерированным MAlonzo, которые имеют типы, поддерживающие те
+         же инварианты, что требует код на Agda.
+   \item Язык Agda расширен прагмой
+         \texttt{\{-\# EXPORT \(AgdaName\) \(HaskellName\) \#-\}}, которой
+         передается имя из Agda и желаемое имя в Haskell. Если сущность
+         \(AgdaName\) представима в Haskell и \(HaskellName\) --- разрешенное
+         имя для этой сущности, то во время компиляции генерируется
+         соответствующая обертка.
+   \item Для модуля \(AgdaModuleName\) код интерфейса помещается в
+         модуль \(MAlonzo.Export.AgdaModuleName\), чтобы отделить
+         код, сгенерированный MAlonzo (находящийся в
+         \(MAlonzo.Code.AgdaModuleName\)) от безопасного интерфейса.
+   \end{itemize}
+}
+
+\frame {
+   \frametitle{Выполняемые трансляции}
+   \framesubtitle{Объявления типов}
+}
+
+\frame {
+   \frametitle{Выполняемые трансляции}
+   \framesubtitle{Типы функций}
+}
+
+\frame {
+   \frametitle{Выполняемые трансляции}
+   \framesubtitle{Термы функций}
+}
+
+\frame {
    \frametitle{Выводы}
 
+}
+
+\frame {
+   \frametitle{EXTRA - Agda 2.3.4 COMPILED\_EXPORT}
+
+   TODO: What does it generate?
 }
