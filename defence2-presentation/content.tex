@@ -130,25 +130,43 @@
 
 \frame {
    \frametitle{Подробности реализации}
-   \framesubtitle{Типы данных}
+   \framesubtitle{Типы данных - тип и конструкторы выразимы}
 
-   \begin{enumerate}
-   \item \textbf{Тип и конструкторы выразимы}.
-      Можно полностью задать этот тип на Haskell и полноценно его использовать.
+   Можно полностью задать этот тип на Haskell и использовать его конструкторы
+   для создания экземпляра и для "pattern matching".
 
-      TODO: Need a transformation function when doing function wrappers or
-      TODO: change the way MAlonzo generates this type.
-   \item \textbf{Хотя бы один конструктор не выразим}.
-      В данном случае тип необходимо представить абстракным.
+   Но в таком случае нужно:
+   \begin{itemize}
+   \item либо подменить этим типом тип, генерируемый MAlonzo,
+   \item либо ввести биекцию между этими 2мя типами, которая будет
+         использоваться при генерации оберток функций.
+   \end{itemize}
+}
 
-      TODO: Cannot limit ourselves with only available constructors - pattern matching.
-      TODO: A fantastic idea because we have newtypes and can just unsafeCoerce.
-   \item \textbf{Ничего не выразимо}.
-      В таком случае этот тип обязан быть скрыт от использования во внешнем коде.
-   \end{enumerate}
+\frame {
+   \frametitle{Подробности реализации}
+   \framesubtitle{Типы данных - хотя бы один конструктор не выразим}
+
+   Тип необходимо сделать абстрактным для внешнего кода. Ограничиваться генерированием
+   только представимых конструкторов нельзя --- множество термов, имеющих данный тип
+   будет отличаться между Agda и Haskell.
+
+   Но у абстрактных типов есть преимущество --- можно использовать \texttt{newtype},
+   оборачивая тип, генерируемый MAlonzo и тогда для трансформации между термами
+   2х типов можно использовать \texttt{unsafeCoerce}.
+
+   Это свойство очень удобное и поэтому даже полностью выразимые типы делаются абстрактными.
 
    TODO: trouble with exported as data as a type parameter to exported with
    newtype
+}
+
+\frame {
+   \frametitle{Подробности реализации}
+   \framesubtitle{Типы данных - ничего не выразимо}
+
+   В таком случае этот тип обязан быть скрыт от использования во внешнем коде.
+
 }
 
 \frame {
