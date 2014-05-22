@@ -160,12 +160,14 @@
    \frametitle{Подробности реализации}
    \framesubtitle{Функции}
 
-   Способ реализации параметрического полиморфизма отличается в Agda и в Haskell.
-
-   TODO: Agda needs a type parameter passed into a term. And MAlonzo generates exactly
-   TODO: that. So a programmer would have to manually pass and skip () when calling
-   TODO: this function.
-   TODO: Therefore, it was decided to use wrappers that would do that automatically.
+   Способ реализации параметрического полиморфизма отличается в Agda и в Haskell:
+   Agda требует передавать параметр типа как аргумент функции, Haskell выводит его
+   автоматически. MAlonzo при генерировании кода оставляет этот дополнительный аргумент,
+   который всегда будет иметь значение \(()\).
+   \\[\baselineskip]
+   Если оставлять этот аргумент в генерируемом интерфейсе, то пользователю придется
+   вручную передавать и пропускать \(()\). Поэтому, генерируются обертки, которые
+   делают это автоматически.
 }
 
 \frame {
