@@ -207,6 +207,18 @@
 \frame {
    \frametitle{\textbf{data} in \textbf{newtype} type parameter}
 
-   TODO: trouble with exported as data as a type parameter to exported with
-   newtype
+   \begin{align*}
+   &\mathbf{newtype}\ List\ a,\quad\mathbf{data}\ T = In\ Int\ |\ Ch\ Char\\
+   &trTtoT1 :: T \rightarrow T1,\quad trT1toT :: T1 \rightarrow T,\quad empty :: List\ a\\
+   \\
+   &add :: T \rightarrow List\ T \rightarrow List\ T\\
+   &add = \lambda x\ xs.\ \texttt{unsafeCoerce}\ (d7\ (trTtoT1\ x)\ (\texttt{unsafeCoerce}\ xs))\\
+   \\
+   &head :: List\ a \rightarrow a\\
+   &head = \lambda xs.\ \texttt{unsafeCoerce}\ (d8\ (\texttt{unsafeCoerce}\ xs))\\
+   \\
+   &test = head\ (add\ (In\ 3)\ empty)
+   \end{align*}
+
+  Для корректной работы \(head\) обязан был вызвать \(trT1toT\) вместо \texttt{unsafeCoerce}.
 }
