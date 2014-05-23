@@ -183,16 +183,24 @@
 \frame {
    \frametitle{Agda 2.3.4}
 
-   TODO: What does COMPILED\_EXPORT generate?
+   \begin{itemize}
+   \item Прагма \texttt{\{-\# COMPILED\_EXPORT \(AgdaName\) \(HaskellName\) \#-\}}.
+   \item Подменяется имя функций (переименовывание типов данных не поддерживается), генерируемых MAlonzo.
+   \item Функции требуют \(Unit\) на место параметров типов.
+   \end{itemize}
 }
 
 \frame {
    \frametitle{Что дальше}
 
    \begin{itemize}
-   \item TODO: Extracting data with constructors
-   \item TODO: Typeclasses and instances
-   \item TODO: More dependent type emulation
+   \item Необходимо что-то сделать для экспортирования типов данных целиком: подменять код MAlonzo или
+         генерировать биекции.
+   \item В Agda есть способ симулировать классы типов из Haskell с помощью \textbf{record} --- можно
+         попробовать генерировать соответствующие классы типов и их реализации.
+   \item Существует множество расширений системы типов Haskell, которые позволяют в той или иной
+         степени реализовывать зависимые типы --- их использование позволит выражать больше типов Agda
+         в Haskell.
    \end{itemize}
 }
 
