@@ -205,7 +205,8 @@ MAlonzo при генерации кода. С другой стороны, вт
 
 \paragraph{Проблема с генерированием типов данных}
 
-Рассмотрим код:
+Рассмотрим код на Agda:
+
 \begin{align*}
 &\mathbf{open\ import}\ Data.Maybe\\
 \\
@@ -237,4 +238,90 @@ MAlonzo при генерации кода. С другой стороны, вт
 &add2 = cons
 \end{align*}
 
-TODO: Why there is no EXPORT of types with constructors and builtins with constructors.
+По нему получится примерно следующий код на Haskell, сгенерируемый MAlonzo:
+
+\begin{align*}
+&\mathbf{data}\ T1\ a0\ a1 = C2\ |\ C3\ a0\ a1\\
+\\
+&d4 = \texttt{unsafeCoerce}\ (\lambda v0\ v1 \rightarrow C2)\\
+\\
+&d5\ v0\ v1\ C2 = \texttt{unsafeCoerce}\ Nothing\\
+&d5\ v0\ v1\ (C3\ v2\ v3) = \texttt{unsafeCoerce}\ (Just\ (\texttt{unsafeCoerce}\ v2))\\
+\\
+&\mathbf{data}\ T6\ a0\ a1\ a2 = C7\ a0\ a1\ a2\\
+\\
+&\mathbf{data}\ T8\ a0 = C9\ a0\ |\ C10\ a0\\
+\\
+&d11 = \texttt{unsafeCoerce} (\lambda v0 \rightarrow C3)\\
+\\
+&d12 = \texttt{unsafeCoerce} (\lambda v0\ v1 \rightarrow C3)\\
+\end{align*}
+
+Если потребовать экспортировать все написанные имена\footnote{
+Нужно представить, что есть поддержка \(Set\ l\)(нужна только для \(Useless\))} и
+потребовать, чтобы \(Useless\) и \(Either\) были экспортированы полностью, то
+можно получить примерно следующий код:
+
+\begin{align*}
+&\mathbf{newtype}\ List\ a = List\ (\mathbf{forall}\ b0\ b1.\ T1\ b0\ b1)\\
+\\
+&empty :: List\ a\\
+&empty = \texttt{unsafeCoerce}\ (d4\ ()\ ())\\
+\\
+&head' :: List\ a \rightarrow Maybe\ a\\
+&head' = \lambda xs \rightarrow \texttt{unsafeCoerce}\ (d13\ ()\ ()\ (
+   \texttt{unsafeCoerce}\ xs))\\
+\\
+&\mathbf{data}\ Useless\ a\ \mathbf{where}\\
+&\quad Useless :: (b \rightarrow a) \rightarrow b \rightarrow Useless\ a\\
+&tUselessToMA :: Useless\ a \rightarrow T6\ a0\ a1\ a2\\
+&tUselessToMA\ (Useless\ a0\ a1) = \texttt{unsafeCoerce}\ (C7\ ()\ (
+   \lambda x \rightarrow\\
+&\quad\texttt{unsafeCoerce}\ (\texttt{unsafeCoerce}\ a0\ (
+   \texttt{unsafeCoerce}\ x)))\ (\texttt{unsafeCoerce}\ a1))\\
+&tUselessFromMA :: T6\ a0\ a1\ a2 \rightarrow Useless\ a\\
+&tUselessFromMA\ (C7\ a0\ a1\ a2) = \texttt{unsafeCoerce}\ (Useless\ (
+   \lambda x \rightarrow\\
+&\quad\texttt{unsafeCoerce}\ (\texttt{unsafeCoerce}\ a1\ (
+   \texttt{unsafeCoerce}\ x)))\ (\texttt{unsafeCoerce}\ a2))\\
+\\
+&\mathbf{data}\ Either'\ a\ b\ \mathbf{where}\\
+&\quad Right' :: b \rightarrow Either'\ a\ b\\
+&\quad Left' :: a \rightarrow Either'\ a\ b\\
+&tEitherToMA :: Either\ a\ b \rightarrow T8\ a0\\
+&tEitherToMA\ (Left'\ a0) = \texttt{unsafeCoerce}\ (C9\ (\texttt{unsafeCoerce}\ a0))\\
+&tEitherToMA\ (Right'\ a0) = \texttt{unsafeCoerce}\ (C10\ (\texttt{unsafeCoerce}\ a0))\\
+&tEitherFromMA :: T8\ a0 \rightarrow Either\ a\ b\\
+&tEitherFromMA\ (C9\ a0) = \texttt{unsafeCoerce}\ (Left'\ (\texttt{unsafeCoerce}\ a0))\\
+&tEitherFromMA\ (C10\ a0) = \texttt{unsafeCoerce}\ (Right'\ (\texttt{unsafeCoerce}\ a0))\\
+\\
+&add1 :: Useless\ a \rightarrow List\ (Useless\ a) \rightarrow List\ (Useless\ a)\\
+&add1 = \lambda x\ xs \rightarrow \texttt{unsafeCoerce} (d11\ () \ (
+   tUselessToMA\ x)\ (\texttt{unsafeCoerce}\ xs))\\
+\\
+&add2 :: Either'\ a\ b \rightarrow List\ (Either'\ a\ b) \rightarrow
+   List\ (Either'\ a\ b)\\
+&add2 = \lambda x\ xs \rightarrow \texttt{unsafeCoerce} (d12\ ()\ () \ (
+   tEitherToMA\ x)\ (\texttt{unsafeCoerce}\ xs))\\
+\end{align*}
+
+А теперь 2 функции из внешнего кода:
+
+\begin{align*}
+&test1 :: Maybe\ (Useless\ Int)\\
+&test1 = head'\ (add1\ (Useless\ read\ \texttt{``3''})\ empty)\\
+\\
+&test2 :: Maybe\ (Either'\ Int\ Char)\\
+&test2 = head'\ (add2\ (Left'\ 3)\ empty)
+\end{align*}
+
+В обоих случаях \(add1\) и \(add2\) используют соответственно \(tUselessToMA\) и
+\(tEitherToMA\) для конвертирования в тип MAlonzo, но \(head'\) использует
+\texttt{unsafeCoerce} вместо \(tUselessFromMA\) и \(tEitherFromMA\) для
+конвертирования обратно. Можно заметить, что \(Either'\) задан с конструкторами
+в другом порядке и поэтому тип \(Either'\) гарантировано отличается от \(T8\)
+и результат \(test2\): \(Just\ (Right'\ `\backslash ETX')\). В случае с
+\(Useless\) проблема: он лежит в \(Set_1\), а трансформация поддерживает только
+\(Set_0\). Поэтому код интерфейса был написан вручную, как если бы была возможность
+его сгенерировать. Здесь \texttt{unsafeCoerce} не применим, так как в конструкторе
+есть параметр типа в качестве аргумента, которого не будет в интерфейсе.
