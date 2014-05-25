@@ -80,11 +80,12 @@ DTD\llbracket AgdaTypeName \rrbracket &\doteq HaskellTypeDeclaration,
 \subsection{Встроенные типы}
 \begin{align*}
 &BTMA\llbracket BuiltinType \rrbracket(AgdaType) = HaskellType\\
-&BTs = \{\texttt{INTEGER}, \texttt{FLOAT}, \texttt{CHAR}, \texttt{STRING}, \texttt{IO}\},
+&Builtins = \{\texttt{INTEGER}, \texttt{FLOAT}, \texttt{CHAR}, \texttt{STRING},
+   \texttt{IO}\},
 \end{align*}
 где
 \begin{description}
-\item[\(BTs\) ---] подмножество встроенных типов, поддерживаемых MAlonzo, которые
+\item[\(Builtins\) ---] подмножество встроенных типов, поддерживаемых MAlonzo, которые
 привязываются к постулатам,
 \item[\(BTMA\) ---] определенная в MAlonzo функция преобразования встроенного
 типа к типу на Haskell.
@@ -124,7 +125,7 @@ TT\llbracket T\ args\ldots \rrbracket(\Gamma) &= \left\{
       a\ TT\llbracket args\ldots \rrbracket(\Gamma) &\quad (T \mapsto a) \in \Gamma \\
       CTMA\llbracket T \rrbracket\ TT\llbracket args\ldots \rrbracket(\Gamma)\\
       BTMA\llbracket B \rrbracket(T)\ TT\llbracket args\ldots \rrbracket(\Gamma)
-         &\quad B \in BTs\\
+         &\quad B \in Builtins\\
       DT\llbracket T \rrbracket\ TT\llbracket args\ldots \rrbracket(\Gamma)\\
    \end{array}\right.\\
 TT\llbracket (A : S) \rightarrow T \rrbracket(\Gamma) &=
