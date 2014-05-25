@@ -1,1 +1,194 @@
 \section{Формальное определение трансформаций}\label{sec:appendix-transformations}
+
+Все преобразования заданы в виде
+\begin{align*}
+TransformName\llbracket Pattern_1 \rrbracket(Args\dots) &= \left\{
+   \begin{array}{l l}
+   Result_1 &\quad Condition_{1,1}\\
+   \vdots\\
+   Result_{k_1} &\quad Condition_{1,k_1}
+   \end{array}\right.\\
+&\vdots\\
+TransformName\llbracket Pattern_n \rrbracket(Args\dots) &= \left\{
+   \begin{array}{l l}
+   Result_m &\quad Condition_{n,1}\\
+   \vdots\\
+   Result_{m+k_n-1} &\quad Condition_{n,k_n}
+   \end{array}\right.
+\end{align*}
+
+По \(Pattern_i\) производится сопоставление c шаблоном в порядке сверху вниз.
+При совпадении, производится проверка соответствующих \(Condition_{i,j}\) сверху вниз,
+пустой \(Condition_{i,j}\) считается успешным.
+При успешном выполнении \(Condition_{i,j}\) проверяется определен ли соответствующий
+\(Result_l\). Если определен, то он возвращается как результат иначе идет переход
+к \(Condition_{i,j+1}\). Если все \(Condition_{i,j}\) для данного \(Pattern_i\)
+проверены, то идет переход к \(Pattern_{i+1}\). Если все \(Pattern_i\) проверены,
+то результат становится неопределенным.
+
+\(Result_l\) определен, если все вызываемые трансформации определены.
+
+\subsection{Кайнды}
+\[
+KT\llbracket AgdaType \rrbracket = HaskellKind
+\]
+
+\begin{align*}
+KT\llbracket Set_0 \rrbracket &= *\\
+KT\llbracket Kind_1 \rightarrow Kind_2 \rrbracket &=
+   KT\llbracket Kind_1 \rrbracket \rightarrow KT\llbracket Kind_2 \rrbracket
+\end{align*}
+
+\subsection{Объявление типов}
+
+\begin{align*}
+DTMA\llbracket AgdaTypeName \rrbracket &= HaskellTypeName\\
+DT\llbracket AgdaTypeName \rrbracket &= HaskellTypeName\\
+DTD\llbracket AgdaTypeName \rrbracket &\doteq HaskellTypeDeclaration,
+\end{align*}
+где
+\begin{description}
+\item[\(DTMA\) ---] имя типа, генерируемого MAlonzo,
+\item[\(DT\) ---] имя запрошенное пользователем с помощью\\
+\texttt{\{-\# EXPORT \(AgdaTypeName\) \(HaskellTypeName\) \#-\}},
+\item[\(DTD\) ---] генерируемое объявление типа с именем \(DT\).
+\end{description}
+
+Когда прагма \texttt{EXPORT} для имени \(AgdaTypeName\) не определена,
+то \(DT\) и \(DTD\) становятся неопределенными.
+
+Используя определение:
+\[
+\mathbf{data}\ AgdaDataType\ (A_1 : S_1) \cdots (A_m : S_m) :
+   S_{m+1} \rightarrow \cdots \rightarrow S_n \rightarrow Set_0\ \mathbf{where} \dots
+\]
+\begin{align*}
+&DTD\llbracket AgdaDataType \rrbracket \doteq\\
+&\quad \mathbf{newtype}\ DT\llbracket AgdaDataType \rrbracket\ (
+   a_1 :: KT\llbracket S_1 \rrbracket) \cdots (a_n :: KT\llbracket S_n \rrbracket)\\
+&\quad\quad = DT\llbracket AgdaDataType \rrbracket\ (\forall b_1 \cdots
+   b_k.\ DTMA\llbracket AgdaDataType \rrbracket\ b_1 \cdots b_k),
+\end{align*}
+где \(k\) --- арность конструктора типов \(DTMA\llbracket AgdaDataType \rrbracket\).
+
+Если \(AgdaDataType\) --- \textbf{record}, то \(m = n\) и \(DTD\) определяется
+точно так же.
+
+Если \(AgdaDataType\) находится в параметризованном модуле или в \textbf{record}, то
+параметры автоматически приписываются как дополнительные \(A_i : S_i\).
+
+\subsection{Встроенные типы}
+\begin{align*}
+&BTMA\llbracket BuiltinType \rrbracket(AgdaType) = HaskellType\\
+&BTs = \{\texttt{INTEGER}, \texttt{FLOAT}, \texttt{CHAR}, \texttt{STRING}, \texttt{IO}\},
+\end{align*}
+где
+\begin{description}
+\item[\(BTs\) ---] подмножество встроенных типов, поддерживаемых MAlonzo, которые
+привязываются к постулатам,
+\item[\(BTMA\) ---] определенная в MAlonzo функция преобразования встроенного
+типа к типу на Haskell.
+\end{description}
+
+Когда \texttt{\{-\# BUILTIN \(BuiltinType\) \(AgdaType\) \#-\}} не определена,
+то \(BTMA\) становится неопределенным.
+
+\begin{align*}
+BTMA\llbracket \texttt{INTEGER} \rrbracket(t) &= Int\\
+BTMA\llbracket \texttt{FLOAT} \rrbracket(t) &= Float\\
+BTMA\llbracket \texttt{CHAR} \rrbracket(t) &= Char\\
+BTMA\llbracket \texttt{STRING} \rrbracket(t) &= String\\
+BTMA\llbracket \texttt{IO} \rrbracket(t) &= IO
+\end{align*}
+
+\subsection{Импортированные типы}
+\[
+CTMA\llbracket AgdaTypeName \rrbracket = HaskellTypeName
+\]
+Когда \texttt{\{-\# COMPILED\_TYPE \(AgdaTypeName\) \(HaskellTypeName\) \#-\}} или\\
+\texttt{\{-\# COMPILED\_DATA \(AgdaTypeName\) \(HaskellTypeName\)\\
+\(HaskellConstructor\)\dots\ \#-\}} заданы, то \(CTMA\) определяется как
+\[
+CTMA\llbracket AgdaTypeName \rrbracket = HaskellTypeName.
+\]
+
+\subsection{Преобразование типов}
+\begin{align*}
+&TT\llbracket AgdaType \rrbracket(Context) = HaskellType\\
+&Context = \{ AgdaTypeVarName \mapsto HaskellTypeVarName \}
+\end{align*}
+
+\begin{align*}
+TT\llbracket T\ args\ldots \rrbracket(\Gamma) &= \left\{
+   \begin{array}{l l}
+      a\ TT\llbracket args\ldots \rrbracket(\Gamma) &\quad (T \mapsto a) \in \Gamma \\
+      CTMA\llbracket T \rrbracket\ TT\llbracket args\ldots \rrbracket(\Gamma)\\
+      BTMA\llbracket B \rrbracket(T)\ TT\llbracket args\ldots \rrbracket(\Gamma)
+         &\quad B \in BTs\\
+      DT\llbracket T \rrbracket\ TT\llbracket args\ldots \rrbracket(\Gamma)\\
+   \end{array}\right.\\
+TT\llbracket (A : S) \rightarrow T \rrbracket(\Gamma) &=
+   \forall (a :: KT\llbracket S \rrbracket).\ TT\llbracket T \rrbracket
+   (\Gamma \cup \{A \mapsto a\})\\
+TT\llbracket (x : T_1) \rightarrow T_2 \rrbracket(\Gamma) &=
+   TT\llbracket T_1 \rrbracket(\Gamma) \rightarrow TT\llbracket T_2 \rrbracket(\Gamma)
+   \quad x \not\in freevars(T_2)
+\end{align*}
+
+\subsection{Преобразование термов}
+
+\begin{align*}
+&Wrap^{2k}\llbracket AgdaType \rrbracket(MAlonzoTerm) = InterfaceTerm\\
+&Wrap^{2k+1}\llbracket AgdaType \rrbracket(InterfaceTerm) = MAlonzoTerm
+\end{align*}
+
+\(Wrap^0\llbracket AgdaType \rrbracket(term)\) задан только, когда
+\(TT\llbracket AgdaType \rrbracket(\varnothing)\) определен.
+
+\begin{align*}
+Wrap^n\llbracket A\ args\ldots \rrbracket(term) &= \texttt{unsafeCoerce}\ term\\
+Wrap^{2k}\llbracket (A : S) \rightarrow T \rrbracket(term) &=
+   Wrap^{2k}\llbracket T \rrbracket(term\ ())\\
+Wrap^{2k+1}\llbracket (A : S) \rightarrow T \rrbracket(term) &=
+   Wrap^{2k+1}\llbracket T \rrbracket(\lambda \_.\ term)\\
+Wrap^n\llbracket (x : T_1) \rightarrow T_2 \rrbracket(term) &=
+   \lambda x.\ Wrap^n\llbracket T_2 \rrbracket(term\ (
+   Wrap^{n+1}\llbracket T_1 \rrbracket(x)))
+\end{align*}
+
+\subsection{Объявление функций}
+\begin{align*}
+VTMA\llbracket AgdaName \rrbracket &= HaskellName\\
+VT\llbracket AgdaName \rrbracket &= HaskellName\\
+VTD\llbracket AgdaName \rrbracket &\doteq HaskellDeclaration,
+\end{align*}
+где
+\begin{description}
+\item[\(VTMA\) ---] имя функции, генерируемой MAlonzo,
+\item[\(VT\) ---] имя запрошенное пользователем с помощью
+\texttt{\{-\# EXPORT \(AgdaName\) \(HaskellName\) \#-\}},
+\item[\(VTD\) ---] генерируемое объявление функции с именем \(VT\).
+\end{description}
+
+Когда прагма \texttt{EXPORT} для имени \(AgdaName\) не определена,
+то \(VT\) и \(VTD\) становятся неопределенными.
+
+Используя определение:
+\begin{align*}
+&AgdaName : AgdaType\\
+&AgdaName = \dots
+\end{align*}
+
+\begin{align*}
+&VTD\llbracket AgdaName \rrbracket \doteq\\
+&\quad\quad VT\llbracket AgdaName \rrbracket :: TT\llbracket AgdaType \rrbracket
+   (\varnothing)\\
+&\quad\quad VT\llbracket AgdaName \rrbracket = Wrap^0\llbracket AgdaType \rrbracket
+   (VTMA\llbracket AgdaName \rrbracket)
+\end{align*}
+
+Если \(AgdaName\) --- конструктор какого-то типа данных, то \(VTD\) можно использовать,
+чтобы выставить его как обычную функцию.
+
+Если \(AgdaName\) находится в параметризованном модуле или в \textbf{record}, то
+параметры автоматически приписываются в \(AgdaType\).
