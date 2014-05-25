@@ -73,11 +73,11 @@
 &\quad yes : (x\ y : A) \rightarrow x \equiv y \rightarrow IsEqual\ A\\
 &\quad no : (x\ y : A) \rightarrow x \not\equiv y \rightarrow IsEqual\ A\\
 \\
-&someFunction_1 : SomeType \rightarrow IsEqual\ Nat\\
-&someFunction_1 = \cdots\\
+&isEqualNat : Nat \rightarrow Nat \rightarrow IsEqual\ Nat\\
+&isEqualNat = \cdots\\
 \\
-&someFunction_2 : SomeOtherType \rightarrow IsEqual\ Nat \rightarrow YetAnotherType\\
-&someFunction_2 = \cdots
+&someFunction : IsEqual\ Nat \rightarrow SomeType\\
+&someFunction = \cdots
 \end{align*}
 
 В примере задаются 4 типа: пустой тип, равенство, неравенство
@@ -85,8 +85,8 @@
 в конструкторах содержатся соответствующие доказательства. Из-за этого
 невозможно полностью этот тип представить в Haskell. Но если сделать этот
 тип абстрактным (скрыть конструкторы), то его станет можно использовать из
-Haskell: построение с помощью \(someFunction_1\) и использование с помощью
-\(someFunction_2\).
+Haskell: построение с помощью \(isEqualNat\) и использование с помощью
+\(someFunction\).
 
 \subsubsection{Обработка простых типов}
 
@@ -104,7 +104,7 @@ Haskell: построение с помощью \(someFunction_1\) и испол
 \end{align*}
 
 Несмотря на это, типы \(Nat\) и \(List\) все равно будут выставлены
-как абстрактные типы. Причина раскрывается в \ref{sec:implementation-wrappers}.
+как абстрактные типы. Причина раскрывается в \ref{sec:implementation-data-trouble}.
 
 \subsection{Существующие решения}
 
@@ -227,8 +227,8 @@ ghc\footnote{\url{http://www.haskell.org/ghc/}} (де-факто стандар�
 \end{align*}
 
 Параметры для типов данных здесь используются только, чтобы объявить
-их для использования в конструкторах: \(T12\), к примеру, мог быть аналогично
-объявлен как:
+их для использования в конструкторах: \(T12\), к примеру, мог бы аналогично
+(с точки зрения сохранения информации о типах) объявляться как:
 
 \begin{align*}
 &\mathbf{data}\ T12\ \mathbf{where}\\
@@ -244,12 +244,35 @@ ghc\footnote{\url{http://www.haskell.org/ghc/}} (де-факто стандар�
 Работа начиналась на версии 2.3.2.2, в версии 2.3.4 появились 2 релевантные возможности:
 \begin{itemize}
 \item давать функциям пользовательские имена и заставлять MAlonzo генерировать для них
-      более-менее осмысленные типы(TODO: explain) с помощью прагмы
+      осмысленные типы с помощью прагмы
       \texttt{\{-\# COMPILED\_EXPORT \(AgdaName\) \(HaskellName\) \#-\}}
       \label{text:agda-compiled-export}
-\item флаг \texttt{---compile-no-main}, который позваоляет компилировать код в
+\item флаг \texttt{---compile-no-main}, который позволяет компилировать код в
       библиотеку, а не исполняемый файл.
 \end{itemize}
+
+Генерируемый тип для функций выполняется по следующим правилам\footnote{\mbox{\url
+{http://wiki.portal.chalmers.se/agda/pmwiki.php?n=ReferenceManual.ForeignFunctionInterface
+}}}:
+
+\begin{align*}
+T\llbracket Set \rrbracket &= ()\\
+T\llbracket x\ As \rrbracket &= x\ T\llbracket As \rrbracket\\
+T\llbracket \lambda (x : A) \rightarrow B \rrbracket &= undef\\
+T\llbracket (x : A) \rightarrow B \rrbracket &= \left\{
+   \begin{array}{l l}
+      \mathbf{forall}\ x.\ T\llbracket A \rrbracket \rightarrow T\llbracket B \rrbracket
+      &\quad x \in fv\ B\\
+      T\llbracket A \rrbracket \rightarrow T\llbracket B \rrbracket
+      &\quad \text{иначе}
+   \end{array}\right.\\
+T\llbracket k\ As \rrbracket &= \left\{
+   \begin{array}{l l}
+      T\ T\llbracket As \rrbracket &\quad \texttt{COMPILED\_TYPE}\ k\ T\\
+      () &\quad \texttt{COMPILED}\ k\ E\\
+      undef &\quad \text{иначе}
+   \end{array}\right.
+\end{align*}
 
 \subsection{Задачи}
 
