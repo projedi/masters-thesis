@@ -46,7 +46,7 @@ HaskellType :: HaskellKind.
 
 \begin{thm}
 Если определено \(DT\llbracket AgdaTypeName \rrbracket = HaskellTypeName\), то
-можно использовать \texttt{unsafeCoerce} для преобразования между
+можно использовать \texttt{unsafeCoerce} для преобразования между\\
 \(HaskellTypeName\) и внутренним представлением \(AgdaTypeName\) в MAlonzo.
 \end{thm}
 
@@ -100,6 +100,12 @@ MAlonzo.
 вызов \(HaskellName\) будет эквивалентен вызову \(AgdaName\) с соответствующими
 аргументами.
 \end{thm}
+
+Это утверждение, в том числе, означает, что все инварианты, поддерживаемые Agda,
+сохраняются. Поскольку набор аргументов, нарушающий инварианты, запрещен для вызова
+в Adga, он так же должен быть запрещен для вызова в Haskell.
+
+TODO: Add remark that this holds as long as MAlonzo does not change denotational semantics.
 
 \begin{proof}
 TODO
