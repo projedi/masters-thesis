@@ -56,7 +56,7 @@ HaskellType :: HaskellKind.
 над \(DTMA\llbracket AgdaTypeName \rrbracket = InternalHaskellTypeName\).
 Тогда гарантируется\footnote{
 \url{https://www.haskell.org/onlinereport/haskell2010/haskellch4.html\#x10-740004.2.3}},
-что термы с типами \(ExternalHaskellTypeName\) и \(InternalHaskellTypeName\) будут иметь
+что термы с типами \(ExternalHaskellTypeName\) и \\\(InternalHaskellTypeName\) будут иметь
 одинаковое внутреннее представление. Значит, можно использовать \texttt{unsafeCoerce}.
 \end{proof}
 
@@ -96,9 +96,9 @@ MAlonzo.
 \subsection{Функции}
 
 \begin{thm}
-Если определено \(VT\llbracket AgdaName \rrbracket = HaskellName\), то
-вызов \(HaskellName\) будет эквивалентен вызову \(AgdaName\) с соответствующими
-аргументами.
+Если определены \(VT\llbracket AgdaName \rrbracket = HaskellName\) и\\
+\(VTD\llbracket AgdaName \rrbracket\), то вызов \(HaskellName\) будет
+эквивалентен вызову \\\(AgdaName\) с соответствующими аргументами.
 \end{thm}
 
 Это утверждение, в том числе, означает, что все инварианты, поддерживаемые Agda,
@@ -108,5 +108,18 @@ MAlonzo.
 TODO: Add remark that this holds as long as MAlonzo does not change denotational semantics.
 
 \begin{proof}
-TODO
+Пусть функция \(AgdaName\) определена с типом \(AgdaType\).
+Структурная индукция по \(AgdaType\):
+\begin{description}
+\item[\(T\ args\dots,\quad T \textnormal{ --- типовой параметр}\):]
+\item[\(T\ args\dots,\quad T \textnormal{ --- импортированный тип}\):]
+\item[\(T\ args\dots,\quad T \textnormal{ --- экспортированный тип}\):]
+\item[\(T\ args\dots,\quad T \textnormal{ --- встроенный тип}\):]
+\item[\((A : S) \rightarrow T\):]
+\item[\((x : T_1) \rightarrow T_2\):]
+\item[\textnormal{иначе}:]
+   тип \(\forall \Gamma.\ TT\llbracket AgdaType \rrbracket(\Gamma)\)
+   не определен, а значит \(VTD\llbracket AgdaName \rrbracket\) тоже
+   не определено.
+\end{description}
 \end{proof}
