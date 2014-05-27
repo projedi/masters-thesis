@@ -103,7 +103,7 @@ MAlonzo.
 
 Это утверждение, в том числе, означает, что все инварианты, поддерживаемые Agda,
 сохраняются. Поскольку набор аргументов, нарушающий инварианты, запрещен для вызова
-в Adga, он так же должен быть запрещен для вызова в Haskell.
+в Agda, он так же должен быть запрещен для вызова в Haskell.
 
 TODO: Add remark that this holds as long as MAlonzo does not change denotational semantics.
 
@@ -125,3 +125,17 @@ TODO: Add remark that this holds as long as MAlonzo does not change denotational
 \end{proof}
 
 TODO: NO impredicative types. RankNTypes do not allow impredicativity: paper\cite{SPJ11}
+
+TODO: Example when impredicative types break stuff. It's pretty much the problem with
+data but when instead of type parameter we have a ((A : Set) -> A -> A). MAlonzo and
+generated interface generate (forall a. () -> a -> a) and (forall a. a -> a). Cannot
+unsafeCoerce between them.
+
+TODO: Why the trick with data does not work for just functions:
+\begin{itemize}
+\item One polymorphic and one specialized function. One puts a thing in. The other
+      gets it out. Therefore in one way we use bijection, in other --- unsafeCoerce.
+\item When we do not hide (forall a. a -> a) inside a datatype we have to store it
+      in a function (a la Reader: (a ->)). But we do not allow to return a function:
+      we always split it into arguments.
+\end{itemize}
