@@ -136,6 +136,7 @@ TODO: Why the trick with data does not work for just functions:
 \item One polymorphic and one specialized function. One puts a thing in. The other
       gets it out. Therefore in one way we use bijection, in other --- unsafeCoerce.
 \item When we do not hide (forall a. a -> a) inside a datatype we have to store it
-      in a function (a la Reader: (a ->)). But we do not allow to return a function:
-      we always split it into arguments.
+      in a function(e.g. pair: ((a -> (forall b. b -> b) -> c) -> c). But we do not
+      allow to return a function - we always split it into arguments. That is always
+      run our bijection for it.
 \end{itemize}
