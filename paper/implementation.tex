@@ -331,3 +331,45 @@ MAlonzo при генерации кода. С другой стороны, вт
 должен иметь внутреннее представление идентичное типу, генерируемому MAlonzo. Значит,
 необходимо либо делать \texttt{newtype}-обертки, либо менять тип, генерируемый
 MAlonzo.
+
+\paragraph{Неприменимость проблемы для функций}
+
+Выше утверждалось, что <<тип данных в интерфейсе должен иметь внутренее представление,
+идентичное типу, генерируемому MAlonzo>>. Тип функций тоже в некотором роде тип данных
+(например, тип пары: \((a \rightarrow b \rightarrow c) \rightarrow c\)) и если функция
+полиморфна, то этот тип будет иметь разные представления в интерфейсе и внутри MAlonzo.
+Рассматривая пример выше, напишем еще одну функцию:
+
+\begin{align*}
+&\text{Agda:}\\
+&add3 : (\forall \{A\} \rightarrow A \rightarrow A) \rightarrow List\ (\forall \{A\}
+   \rightarrow A \rightarrow A) \rightarrow List\ (\forall \{A\} \rightarrow A
+   \rightarrow A)\\
+&add3 = cons\\
+\\
+&\text{MAlonzo:}\\
+&d13 = \texttt{unsafeCoerce}\ C3\\
+\\
+&\text{Интерфейс:}\\
+&add3 :: (\mathbf{forall}\ a.\ a \rightarrow a) \rightarrow
+   List\ (\mathbf{forall}\ a.\ a \rightarrow a) \rightarrow
+   List\ (\mathbf{forall}\ a.\ a \rightarrow a)\\
+&add3 = \lambda f\ fs \rightarrow \texttt{unsafeCoerce}\ (d13\\
+&\quad(\lambda \_\ x \rightarrow \texttt{unsafeCoerce}\ (
+      f\ (\texttt{unsafeCoerce}\ x)))
+   \ (\texttt{unsafeCoerce}\ fs))\\
+\\
+&\text{Тест:}\\
+&test3 :: Int\\
+&test3 =\\
+&\quad\mathbf{case}\ head'\ (add3\ id\ empty)\ \mathbf{of}\\
+&\quad\ Nothing \rightarrow \texttt{error}\ \text{``Impossible''}\\
+&\quad\ Just\ f \rightarrow f\ 3
+\end{align*}
+
+Ошибка должна быть та же самая: один раз функцию упаковали в список, разложив ее
+на аргументы, достали из него с помощью \texttt{unsafeCoerce}. Но такой код
+нескомпилируется: он требует расширения языка \texttt{ImpredicativeTypes},
+без которого у типа данных типовые параметры обязаны быть мономорфными. А поскольку
+только полиморфные функции отличаются по структуре между интерфейсом и MAlonzo,
+то проблема решается автоматически.
