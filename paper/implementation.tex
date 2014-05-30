@@ -373,3 +373,26 @@ MAlonzo.
 без которого у типа данных типовые параметры обязаны быть мономорфными. А поскольку
 только полиморфные функции отличаются по структуре между интерфейсом и MAlonzo,
 то проблема решается автоматически.
+
+Что если теперь вместо специально построенного \(List\) использовать чистое
+\(\lambda\)-исчисление для эмуляции типов данных. Сразу рассмотрим типы функций
+в интерфейсе:
+
+TODO: Better type parameters. And maybe some types should be more specific
+\begin{align*}
+&lnil :: a \rightarrow b\\
+&lcons :: a \rightarrow ((a \rightarrow b \rightarrow c) \rightarrow d \rightarrow b)
+   \rightarrow (a \rightarrow b \rightarrow c) \rightarrow d \rightarrow c\\
+&lhead :: ((c \rightarrow b \rightarrow c) \rightarrow (d \rightarrow e \rightarrow e)
+   \rightarrow a) \rightarrow a\\
+&ladd :: (\mathbf{forall}\ a.\ a \rightarrow a) \rightarrow
+   (((\mathbf{forall}\ a.\ a \rightarrow a) \rightarrow b \rightarrow c)
+   \rightarrow d \rightarrow b) \rightarrow \\
+&\quad((\mathbf{forall}\ a.\ a \rightarrow a) \rightarrow b \rightarrow c)
+   \rightarrow d \rightarrow c\\
+\\
+&test = lhead\ (ladd\ id\ lnil)
+\end{align*}
+
+Получится та же самая ошибка компиляции: требуется импредикативность. На самом деле,
+ошибка с импредикативностью при использовании \(List\) появляется из-за аналогичных причин.
