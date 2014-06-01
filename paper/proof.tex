@@ -2,7 +2,7 @@
 
 \subsection{Кайнды}
 
-\begin{thm}
+\begin{thm}\label{thm:kinds}
 Если
 \[
 KT\llbracket AgdaType \rrbracket = HaskellKind
@@ -128,32 +128,32 @@ TODO: Add remark that this holds as long as MAlonzo does not change denotational
    мономорфная функция, так как иначе требуются импредикативные типы\cite{SPJ11}.
    А мономорфные функции имеют аналогичное представление между MAlonzo и интерфейсом.
 
-   Для переменных инвариант: если при вызове \(T\) специализируется в \(SpecType\),
+   Для переменных логический инвариант: если при вызове \(T\) специализируется в \(SpecType\),
    то на всех остальных местах \(T\) специализируется в \(SpecType\). Это
    поддерживается на Agda и на Haskell.
 \item[\((A : S) \rightarrow T\):]
+   При преобразовании терма с соответствующим типом из MAlonzo в интерфейс, \(()\)
+   подставляется в терм из MAlonzo первым аргументом. При обратном преобразовании,
+   терм \(InterfaceTerm\) оборачивается в \(\lambda \_ \rightarrow InterfaceTerm\).
+   Для \(T\) утверждение выполняется по индукции.
+
+   Логический смысл --- объявление утверждения, параметризуемого согласно \(S\). Как было
+   показано в \ref{thm:kinds}, если существует тип в Agda, удовлентворяющий \(S\),
+   значит существует тип в Haskell, удовлетворяющий соответствующему кайнду.
+\item[\((x : T_1) \rightarrow T_2,\quad x \not\in freevars(T_2)\):]
+   Для \(T_1\) и \(T_2\) утверждение выполняется по индукции. При трансляции терма:
+   \begin{description}
+   \item[MAlonzo \(\rightarrow\) интерфейс:]
+      терм с типом \(T_1\) придет из интерфейса, терм с типом \(T_2\) должен быть в MAlonzo;
+   \item[интерфейс \(\rightarrow\) MAlonzo:]
+      терм с типом \(T_1\) придет из MAlonzo, терм с типом \(T_2\) должен быть в интерфейсе.
+   \end{description}
+   Что и происходит при увеличении уровня вложенности в \(Wrap\).
    
-\item[\((x : T_1) \rightarrow T_2\):]
+   Логический смысл --- импликация для Agda и для Haskell.
 \item[\textnormal{иначе}:]
    тип \(\forall \Gamma.\ TT\llbracket AgdaType \rrbracket(\Gamma)\)
    не определен, а значит \(VTD\llbracket AgdaName \rrbracket\) тоже
    не определено.
 \end{description}
 \end{proof}
-
-TODO: NO impredicative types. RankNTypes do not allow impredicativity: paper\cite{SPJ11}
-
-TODO: Example when impredicative types break stuff. It's pretty much the problem with
-data but when instead of type parameter we have a ((A : Set) -> A -> A). MAlonzo and
-generated interface generate (forall a. () -> a -> a) and (forall a. a -> a). Cannot
-unsafeCoerce between them.
-
-TODO: Why the trick with data does not work for just functions:
-\begin{itemize}
-\item One polymorphic and one specialized function. One puts a thing in. The other
-      gets it out. Therefore in one way we use bijection, in other --- unsafeCoerce.
-\item When we do not hide (forall a. a -> a) inside a datatype we have to store it
-      in a function(e.g. pair: ((a -> (forall b. b -> b) -> c) -> c). But we do not
-      allow to return a function - we always split it into arguments. That is always
-      run our bijection for it.
-\end{itemize}
