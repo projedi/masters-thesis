@@ -68,11 +68,9 @@ haddock\footnote{\url{http://www.haskell.org/haddock/}} отображать т�
 \mathbf{data}\ AgdaName\ (A_0 : S_0) \cdots (A_m : S_m) :
 S_{m+1} \rightarrow \cdots \rightarrow S_n \rightarrow Set_0\ \mathbf{where}\ \dots,
 \]
-где \(S_i\) - комбинация \(Set_0\)\footnote{\(Set_0\) --- консервативный выбор}
+где \(S_i\) - комбинация \(Set_0\)
 и \(\rightarrow\), то аналогичным объявлением на Haskell будет:
 
-TODO: Say that there are some Set1 types that are representable in haskell
-but we are still not gonna to.
 \[
 \mathbf{newtype}\ HaskellName\ (a_0 :: K_0) \cdots (a_n :: K_n) = \dots,
 \]
@@ -90,6 +88,10 @@ but we are still not gonna to.
 \]
 \(K_i\) представимы по индукции.
 \end{description}
+
+\(Set_0\) --- консервативный выбор. Существуют типы из \(Set_1\), представимые в Haskell
+с помощью экзистенциальных типов. Но было принято решение ограничиться \(Set_0\),
+потому что в Agda верно \(Set_0 : Set_1\), а в Haskell \(* :: *\) --- неверно.
 
 Теперь, MAlonzo по \(AgdaName\) сгенерирует
 \[
@@ -378,7 +380,6 @@ MAlonzo.
 \(\lambda\)-исчисление для эмуляции типов данных. Сразу рассмотрим типы функций
 в интерфейсе:
 
-TODO: Better type parameters. And maybe some types should be more specific
 \begin{align*}
 &lnil :: a \rightarrow b\\
 &lcons :: a \rightarrow ((a \rightarrow b \rightarrow c) \rightarrow d \rightarrow b)

@@ -255,7 +255,6 @@ ghc\footnote{\url{http://www.haskell.org/ghc/}} (де-факто стандар�
 {http://wiki.portal.chalmers.se/agda/pmwiki.php?n=ReferenceManual.ForeignFunctionInterface
 }}}:
 
-TODO: Explain and stuff
 \begin{align*}
 T\llbracket Set \rrbracket &= ()\\
 T\llbracket x\ As \rrbracket &= x\ T\llbracket As \rrbracket\\
@@ -263,14 +262,14 @@ T\llbracket \lambda (x : A) \rightarrow B \rrbracket &= undef\\
 T\llbracket (x : A) \rightarrow B \rrbracket &= \left\{
    \begin{array}{l l}
       \mathbf{forall}\ x.\ T\llbracket A \rrbracket \rightarrow T\llbracket B \rrbracket
-      &\quad x \in fv\ B\\
+      &\quad x \in freevars(B)\\
       T\llbracket A \rrbracket \rightarrow T\llbracket B \rrbracket
       &\quad \text{иначе}
    \end{array}\right.\\
 T\llbracket k\ As \rrbracket &= \left\{
    \begin{array}{l l}
-      T\ T\llbracket As \rrbracket &\quad \texttt{COMPILED\_TYPE}\ k\ T\\
-      () &\quad \texttt{COMPILED}\ k\ E\\
+      T\ T\llbracket As \rrbracket &\quad \text{задан }\texttt{\{-\# COMPILED\_TYPE \(k\) \(T\) \#-\}}\\
+      () &\quad \text{задан }\texttt{\{-\# COMPILED \(k\) \(E\) \#-\}}\\
       undef &\quad \text{иначе}
    \end{array}\right.
 \end{align*}
