@@ -105,7 +105,8 @@ MAlonzo.
 сохраняются. Поскольку набор аргументов, нарушающий инварианты, запрещен для вызова
 в Agda, он так же должен быть запрещен для вызова в Haskell.
 
-TODO: Add remark that this holds as long as MAlonzo does not change denotational semantics.
+Утверждение верно, если MAlonzo корректен: то есть генерируемый им код сохраняет семантику
+кода Agda.
 
 \begin{proof}
 Пусть функция \(AgdaName\) определена с типом \(AgdaType\).
@@ -118,9 +119,16 @@ TODO: Add remark that this holds as long as MAlonzo does not change denotational
    Логический смысл типа данных --- это утверждение с ограниченным набором доказательств (конструкторов).
    В случае GADT набор разрешенных конструкторов зависит от параметров \(args\dots\).
    Таким образом, нужно показать, что разрешенные конструкторы для \(T\ args\dots\) для стороны Agda и интерфейса
-   одни и те же.
+   одни и те же. Терм с типом \(T\ \widehat{args}\dots\) мог быть сконструирован на стороне интерфейса вызовом конструктора
+   либо на стороне MAlonzo вызовом функции-обертки, когда \(args\dots\) --- специализация \(\widehat{args}\dots\).
 
-   TODO: prove.
+   \begin{description}
+   \item[вызван конструктор на стороне интерфейса:]
+      Работает для\\ \texttt{COMPILED\_DATA} типов. MAlonzo гарантирует, что тип в Agda будет таким же, что и тип
+      импортированный из Haskell.
+   \item[вызвана функция-обертка:]
+      TODO: And what here?
+   \end{description}
 \item[\(T\ args\dots,\quad T \textnormal{ --- типовой параметр}\):]
    Если \(T\) будет специализирована на тип данных, то это случай из предыдущего пункта и
    \texttt{unsafeCoerce} легален. Если \(T\) будет специализирована на функцию, то список
@@ -150,7 +158,7 @@ TODO: Add remark that this holds as long as MAlonzo does not change denotational
    \end{description}
    Что и происходит при увеличении уровня вложенности в \(Wrap\).
    
-   Логический смысл --- импликация для Agda и для Haskell.
+   Логический смысл --- импликация для Agda, и для Haskell.
 \item[\textnormal{иначе}:]
    тип \(\forall \Gamma.\ TT\llbracket AgdaType \rrbracket(\Gamma)\)
    не определен, а значит \(VTD\llbracket AgdaName \rrbracket\) тоже
