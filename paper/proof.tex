@@ -37,14 +37,14 @@ HaskellType :: HaskellKind.
    \mathbf{data}\ HaskellType\ (a :: K_1) :: K_2.
    \]
    Это тоже валидный тип на Haskell, поскольку на место \(a\) можно подставить
-   \(HaskellKind_1\) и его кайнд будет \(K_1 \rightarrow K_2 = HaskellKind\).
+   \(HaskellKind_1\), и его кайнд --- \(K_1 \rightarrow K_2 = HaskellKind\).
 \item[\textnormal{иначе}:] \(KT\llbracket AgdaType \rrbracket\) не определена.
 \end{description}
 \end{proof}
 
 \subsection{Объявление типов}
 
-\begin{thm}
+\begin{thm}\label{thm:exported-types}
 Если определено \(DT\llbracket AgdaTypeName \rrbracket = HaskellTypeName\), то
 можно использовать \texttt{unsafeCoerce} для преобразования между\\
 \(HaskellTypeName\) и внутренним представлением \(AgdaTypeName\) в MAlonzo.
@@ -62,7 +62,7 @@ HaskellType :: HaskellKind.
 
 \subsection{Встроенные типы}
 
-\begin{thm}
+\begin{thm}\label{thm:builtin-types}
 Если определена \(BTMA\llbracket B \rrbracket(AgdaType) = HaskellType\) для
 некоторого \(B \in Builtins\), то можно использовать \texttt{unsafeCoerce}
 для преобразования между \(HaskellType\) и внутренним представлением \(AgdaType\) в
@@ -78,7 +78,7 @@ MAlonzo.
 
 \subsection{Импортированные типы}
 
-\begin{thm}
+\begin{thm}\label{thm:imported-types}
 Если определена\\ \(CTMA\llbracket AgdaTypeName \rrbracket = HaskellTypeName\), то
 можно использовать \texttt{unsafeCoerce} для преобразования между
 \(HaskellTypeName\) и внутренним представлением \(AgdaTypeName\) в MAlonzo.
@@ -111,11 +111,28 @@ TODO: Add remark that this holds as long as MAlonzo does not change denotational
 Пусть функция \(AgdaName\) определена с типом \(AgdaType\).
 Структурная индукция по \(AgdaType\):
 \begin{description}
+\item[\(T\ args\dots,\quad T \textnormal{ --- экспортированный, встроенный и импортированный тип}\):]
+   По доказанным выше утверждениям: \ref{thm:exported-types}, \ref{thm:builtin-types} и \ref{thm:imported-types} ---
+   использование \texttt{unsafeCoerce} между соответствующими типами MAlonzo и интерфейса легально.
+
+   Логический смысл типа данных --- это утверждение с ограниченным набором доказательств (конструкторов).
+   В случае GADT набор разрешенных конструкторов зависит от параметров \(args\dots\).
+   Таким образом, нужно показать, что разрешенные конструкторы для \(T\ args\dots\) для стороны Agda и интерфейса
+   одни и те же.
+
+   TODO: prove.
 \item[\(T\ args\dots,\quad T \textnormal{ --- типовой параметр}\):]
-\item[\(T\ args\dots,\quad T \textnormal{ --- импортированный тип}\):]
-\item[\(T\ args\dots,\quad T \textnormal{ --- экспортированный тип}\):]
-\item[\(T\ args\dots,\quad T \textnormal{ --- встроенный тип}\):]
+   Если \(T\) будет специализирована на тип данных, то это случай из предыдущего пункта и
+   \texttt{unsafeCoerce} легален. Если \(T\) будет специализирована на функцию, то список
+   \(args\dots\) пуст. При специализации вместо \(T\) может быть подставлена только
+   мономорфная функция, так как иначе требуются импредикативные типы\cite{SPJ11}.
+   А мономорфные функции имеют аналогичное представление между MAlonzo и интерфейсом.
+
+   Для переменных инвариант: если при вызове \(T\) специализируется в \(SpecType\),
+   то на всех остальных местах \(T\) специализируется в \(SpecType\). Это
+   поддерживается на Agda и на Haskell.
 \item[\((A : S) \rightarrow T\):]
+   
 \item[\((x : T_1) \rightarrow T_2\):]
 \item[\textnormal{иначе}:]
    тип \(\forall \Gamma.\ TT\llbracket AgdaType \rrbracket(\Gamma)\)
