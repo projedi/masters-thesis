@@ -104,8 +104,7 @@ S_{m+1} \rightarrow \cdots \rightarrow S_n \rightarrow Set_0\ \mathbf{where}\ \d
 \end{align*}
 то для трансформации между термом из MAlonzo, имеющим тип \(T_k\ args\dots\) и
 термом, выставленным наружу, имеющим тип \(HaskellName\ args\dots\)
-можно использовать \texttt{unsafeCoerce}, так как \textbf{newtype} гарантирует\footnote{
-\url{https://www.haskell.org/onlinereport/haskell2010/haskellch4.html\#x10-740004.2.3}}
+можно использовать \texttt{unsafeCoerce}, так как \textbf{newtype} гарантирует\cite{HaskellNewtype}
 идентичное внутреннее представление.
 
 \subsubsection{Типы функций}\label{sec:implementation-functions}
