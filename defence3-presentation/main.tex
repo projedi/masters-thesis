@@ -1,0 +1,33 @@
+\documentclass{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[normalem]{ulem} % For strikethrough text
+\usepackage{hyperref}
+\usepackage{bussproofs}
+\usepackage{multirow}
+\usepackage{mathtools}
+
+\usecolortheme{orchid}
+
+\hypersetup{pdfstartview={FitH}}
+
+\newcommand{\slidecount}{\pageref{meta:slidecount}}
+\setbeamertemplate{footline}{\hfill\insertframenumber/\slidecount}
+
+\title{Экстракция кода из Agda в Haskell}
+\author{\scriptsize Шабалин Александр Леонидович}
+\institute{{\tiny научный руководитель}\\
+   \vspace{.10cm}к.~ф.-м.~н.~Москвин~Дeнис~Николаевич}
+\date{\scriptsize Академический университет\\ \vspace{.10cm}2014 г.}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\include{content}
+
+\end{document}
