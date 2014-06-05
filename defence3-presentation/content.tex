@@ -7,6 +7,8 @@
    \item Agda --- функциональный язык программирования с системой типой, позволяющей
          строить и проверять логические формулы над элементами языка.
    \end{itemize}
+
+   TODO: Super small example
 }
 
 \frame {
@@ -119,8 +121,8 @@
    Agda:
    \begin{align*}
    &\mathbf{data}\ IsEqual\ (A : Set) : Set\ \mathbf{where}\\
-   &\quad yes : (x\ y : A) \rightarrow (x \equiv y) \rightarrow IsEqual\ A\\
-   &\quad no : (x\ y : A) \rightarrow (x \not\equiv y) \rightarrow IsEqual\ A
+   &\quad yes : (x\ y : A) \rightarrow x \equiv y \rightarrow IsEqual\ A\\
+   &\quad no : (x\ y : A) \rightarrow x \not\equiv y \rightarrow IsEqual\ A
    \end{align*}
 
    Haskell:
@@ -158,6 +160,12 @@
    \end{itemize}
 }
 
+\frame {
+   \frametitle{Доказательство корректности}
+
+   Методом структурной индукции выполняемые трансформации были показаны корректными.
+}
+
 \frame {\label{meta:slidecount}
    \frametitle{Выводы}
 
@@ -170,7 +178,7 @@
 }
 
 \frame {
-   \frametitle{Agda 2.3.4}
+   \frametitle{Agda 2.4.0}
 
    \begin{itemize}
    \item Прагма \texttt{\{-\# COMPILED\_EXPORT \(AgdaName\) \(HaskellName\) \#-\}}.
@@ -183,8 +191,8 @@
    \frametitle{Что дальше}
 
    \begin{itemize}
-   \item Необходимо что-то сделать для экспортирования типов данных целиком: подменять код MAlonzo или
-         генерировать биекции.
+   \item Необходимо сделать экспортирования типов данных целиком: подменять код MAlonzo для
+         тиопв данных и конструкторов.
    \item В Agda есть способ симулировать классы типов из Haskell с помощью \textbf{record} --- можно
          попробовать генерировать соответствующие классы типов и их реализации.
    \item Существует множество расширений системы типов Haskell, которые позволяют в той или иной
