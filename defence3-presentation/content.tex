@@ -155,7 +155,7 @@
    \begin{align*}
    &identity :: \mathbf{forall}\ (a :: *).\ a \rightarrow a\\
    &identity = \lambda x \rightarrow \texttt{unsafeCoerce}\\
-   &\quad(mAlonzoTerm\ Unit\ (\texttt{unsafeCoerce}\ x))
+   &\quad(mAlonzoTerm\ ()\ (\texttt{unsafeCoerce}\ x))
    \end{align*}
 
    \begin{itemize}
